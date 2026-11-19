@@ -1,0 +1,278 @@
+# Acciones independientes de Telegram; config_entry_id siempre explícito.
+get_shopping:
+  name: "Consultar compra"
+  description: "Devuelve grupos, líneas, total y contadores."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+get_menu:
+  name: "Consultar menú"
+  description: "Devuelve todas las entradas de la semana que contiene la fecha."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    week:
+      name: "Fecha de la semana"
+      required: true
+      selector: {"date": {}}
+get_products:
+  name: "Consultar productos"
+  description: "Sin nombre: catálogo. Con nombre: coincidencias para compra rápida."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    name:
+      name: "Nombre para buscar"
+      required: false
+      selector: {"text": {}}
+add_shopping:
+  name: "Añadir a compra"
+  description: "Si hay ambigüedad devuelve status: choose y written: false con candidatos. Repite una vez con product_id elegido. Un producto nuevo se crea con precio 0."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    name:
+      name: "Nombre"
+      required: true
+      selector: {"text": {}}
+    quantity:
+      name: "Cantidad"
+      required: false
+      selector: {"number": {"min": 0.001, "max": 100000, "step": 0.001, "mode": "box"}}
+    product_id:
+      name: "ID exacto del producto y supermercado"
+      required: false
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    price_cents:
+      name: "Precio en céntimos"
+      required: false
+      selector: {"number": {"min": 0, "max": 100000000, "mode": "box"}}
+update_shopping:
+  name: "Modificar línea de compra"
+  description: "Indica cantidad y/o comprado. checked es un set explícito, no un toggle."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    item_id:
+      name: "ID de la línea (no del producto)"
+      required: true
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    quantity:
+      name: "Cantidad"
+      required: false
+      selector: {"number": {"min": 0.001, "max": 100000, "step": 0.001, "mode": "box"}}
+    checked:
+      name: "Comprado"
+      required: false
+      selector: {"boolean": {}}
+adjust_shopping:
+  name: "Ajustar cantidad"
+  description: "Ajuste atómico de una unidad; no elimina una línea al bajar a cero."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    item_id:
+      name: "ID de la línea"
+      required: true
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    delta:
+      name: "Ajuste"
+      required: true
+      selector: {"select": {"options": [{"value": "-1", "label": "Restar una unidad"}, {"value": "1", "label": "Sumar una unidad"}]}}
+remove_shopping:
+  name: "Quitar línea de compra"
+  description: "Requiere confirmación. Conserva producto, historial y menú."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    item_id:
+      name: "ID de la línea"
+      required: true
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    confirm:
+      name: "Confirmar"
+      required: true
+      selector: {"boolean": {}}
+      description: "Debe ser true. Elimina solo el recurso indicado; no hay papelera."
+clear_shopping:
+  name: "Limpiar compra"
+  description: "Requiere confirmación. checked_only true limpia comprados; false vacía la compra. Conserva catálogo, historial y menú."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    checked_only:
+      name: "Solo comprados"
+      required: true
+      selector: {"boolean": {}}
+    confirm:
+      name: "Confirmar"
+      required: true
+      selector: {"boolean": {}}
+      description: "Debe ser true. Elimina solo el recurso indicado; no hay papelera."
+add_menu:
+  name: "Añadir plato"
+  description: "Añade una entrada independiente. No sustituye otros platos de la franja."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    date:
+      name: "Fecha"
+      required: true
+      selector: {"date": {}}
+    slot:
+      name: "Franja"
+      required: true
+      selector: {"select": {"options": [{"value": "lunch", "label": "Comida"}, {"value": "dinner", "label": "Cena"}]}}
+    text:
+      name: "Plato"
+      required: true
+      selector: {"text": {}}
+update_menu:
+  name: "Editar plato"
+  description: "Edita solo entry_id; no edita ni borra el resto de su franja."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    entry_id:
+      name: "ID de la entrada del menú"
+      required: true
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    date:
+      name: "Fecha"
+      required: true
+      selector: {"date": {}}
+    slot:
+      name: "Franja"
+      required: true
+      selector: {"select": {"options": [{"value": "lunch", "label": "Comida"}, {"value": "dinner", "label": "Cena"}]}}
+    text:
+      name: "Nuevo texto"
+      required: true
+      selector: {"text": {}}
+remove_menu:
+  name: "Quitar plato"
+  description: "Requiere confirmación. Elimina únicamente entry_id."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    entry_id:
+      name: "ID del plato"
+      required: true
+      selector: {"number": {"min": 1, "max": 9223372036854775807, "mode": "box"}}
+    confirm:
+      name: "Confirmar"
+      required: true
+      selector: {"boolean": {}}
+      description: "Debe ser true. Elimina solo el recurso indicado; no hay papelera."
+add_menu_batch:
+  name: "Añadir varios platos"
+  description: "Lista de 1 a 20 textos. Cada texto es un plato, no se divide por la conjunción y."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    date:
+      name: "Fecha"
+      required: true
+      selector: {"date": {}}
+    slot:
+      name: "Franja"
+      required: true
+      selector: {"select": {"options": [{"value": "lunch", "label": "Comida"}, {"value": "dinner", "label": "Cena"}]}}
+    texts:
+      name: "Platos"
+      required: true
+      selector: {"object": {}}
+      description: "Lista YAML de textos, de 1 a 180 caracteres cada uno."
+duplicate_week:
+  name: "Duplicar semana"
+  description: "Requiere confirmación. Copia a la semana siguiente conservando sus platos; no añade compras."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    week:
+      name: "Fecha de la semana de origen"
+      required: true
+      selector: {"date": {}}
+    confirm:
+      name: "Confirmar"
+      required: true
+      selector: {"boolean": {}}
+      description: "Debe ser true. Elimina solo el recurso indicado; no hay papelera."
+telegram_update:
+  name: "Procesar evento Telegram"
+  description: "Uso del blueprint 2026.11.1. No suministres datos recibidos de webhooks públicos. La entidad, los chats y el bot se validan de nuevo."
+  response:
+    optional: true
+  fields:
+    config_entry_id:
+      name: "Entrada Menú y Compra"
+      required: true
+      selector: {"config_entry": {"integration": "menu_compra"}}
+    event_entity:
+      name: "Entidad Telegram"
+      required: true
+      selector: {"entity": {"filter": [{"domain": "event", "integration": "telegram_bot"}]}}
+    event_timestamp:
+      name: "Nuevo timestamp del trigger"
+      required: true
+      selector: {"text": {}}
+    previous_timestamp:
+      name: "Timestamp anterior existente"
+      required: true
+      selector: {"text": {}}
+    event_data:
+      name: "Snapshot de campos Telegram de trigger.to_state"
+      required: true
+      selector: {"object": {}}

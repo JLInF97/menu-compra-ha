@@ -1,0 +1,4 @@
+# Dependencias directas; versiones estables consultadas en PyPI.
+# Python >=3.11 para desarrollo; Python 3.12 en el contenedor.
+fastapi==0.162.5
+uvicorn==0.54.0

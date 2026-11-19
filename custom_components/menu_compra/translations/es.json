@@ -1,0 +1,67 @@
+{
+  "title": "Menú y Compra",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar Menú y Compra",
+        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "data": {
+          "base_url": "URL interna de la aplicación",
+          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
+          "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
+        }
+      },
+      "reconfigure": {
+        "title": "Conectar Menú y Compra",
+        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "data": {
+          "base_url": "URL interna de la aplicación",
+          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
+          "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
+        }
+      },
+      "reauth_confirm": {
+        "title": "Conectar Menú y Compra",
+        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "data": {
+          "base_url": "URL interna de la aplicación",
+          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
+          "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Bridge desactivado o clave no válida. Actívalo y copia su clave actual.",
+      "cannot_connect": "No se pudo conectar con el bridge 0.6.0. Comprueba URL interna, red y versión.",
+      "invalid_settings": "Revisa URL, clave completa, entidad Telegram y chats (IDs enteros, incluidos negativos para grupos)."
+    },
+    "abort": {
+      "single_instance_allowed": "Solo se permite una instancia. Usa Configurar o Reconfigurar la existente.",
+      "already_configured": "Ya está configurado.",
+      "reconfigure_successful": "Conexión reconfigurada.",
+      "reauth_successful": "Clave actualizada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Conectar Menú y Compra",
+        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "data": {
+          "base_url": "URL interna de la aplicación",
+          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
+          "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
+        }
+      }
+    },
+    "error": {
+      "invalid_auth": "Bridge desactivado o clave no válida.",
+      "cannot_connect": "No se pudo conectar con el bridge 0.6.0.",
+      "invalid_settings": "Revisa URL, clave, entidad Telegram y lista de chats."
+    }
+  }
+}

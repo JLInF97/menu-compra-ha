@@ -1,0 +1,65 @@
+blueprint:
+  name: Menú y Compra · Telegram (Core 2026.11.1)
+  description: >-
+    Reutiliza el bot Telegram existente y su entidad event. Solo procesa nuevos
+    timestamps con estado anterior válido. La integración valida el bot del registro,
+    la entidad configurada y los chats permitidos; no consume otros comandos.
+    Instala custom_components/menu_compra y añade su integración antes de usarlo.
+  domain: automation
+  homeassistant:
+    min_version: 2026.11.1
+  input:
+    menu_compra_entry:
+      name: Entrada de Menú y Compra
+      selector:
+        config_entry:
+          integration: menu_compra
+    telegram_event:
+      name: Entidad de eventos del bot Telegram existente
+      description: Debe ser la misma entidad seleccionada en Menú y Compra.
+      selector:
+        entity:
+          filter:
+            - domain: event
+              integration: telegram_bot
+
+triggers:
+  - trigger: state
+    entity_id: !input telegram_event
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ trigger.from_state is not none
+         and trigger.to_state is not none
+         and trigger.from_state.state not in ['unknown', 'unavailable', '']
+         and trigger.to_state.state not in ['unknown', 'unavailable', '']
+         and trigger.from_state.state != trigger.to_state.state
+         and as_timestamp(trigger.from_state.state, none) is not none
+         and as_timestamp(trigger.to_state.state, none) is not none
+         and as_timestamp(trigger.to_state.state) > as_timestamp(trigger.from_state.state)
+         and trigger.to_state.attributes.get('event_type') in ['telegram_command', 'telegram_callback'] }}
+
+actions:
+  - action: menu_compra.telegram_update
+    data:
+      config_entry_id: !input menu_compra_entry
+      event_entity: !input telegram_event
+      event_timestamp: "{{ trigger.to_state.state }}"
+      previous_timestamp: "{{ trigger.from_state.state }}"
+      # Solo campos simples: attrs.date es datetime y no sobrevive al
+      # literal_eval del resultado nativo de las plantillas HA.
+      event_data: >-
+        {% set a = trigger.to_state.attributes %}
+        {% set bot = a.get('bot') or {} %}
+        {% set msg = a.get('message') or {} %}
+        {{ {'event_type': a.get('event_type'), 'id': a.get('id'),
+            'chat_id': a.get('chat_id'), 'user_id': a.get('user_id'),
+            'command': a.get('command'), 'args': a.get('args'),
+            'data': a.get('data'), 'message_thread_id': a.get('message_thread_id'),
+            'bot': {'config_entry_id': bot.get('config_entry_id'), 'username': bot.get('username')},
+            'message': {'message_thread_id': msg.get('message_thread_id')}} }}
+
+mode: parallel
+max: 30
+max_exceeded: warning

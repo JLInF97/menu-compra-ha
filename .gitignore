@@ -1,0 +1,45 @@
+# Python y herramientas locales
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+node_modules/
+build/
+# Evidencia histórica local: CI genera sus propios informes y capturas.
+evidencias/
+
+# Datos personales de desarrollo; nunca incluirlos al distribuir la app
+.local-data/
+datos-locales/
+dist/
+.data/
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db
+*.db-*
+.env
+.env.*
+ha_bridge.json
+!.env.example
+
+# Archivos privados y de diseño/desarrollo que no se publican
+secrets.yaml
+options.json
+*.log
+diseno/
+CONTRACT.md
+CHANGES-*.md
+
+# Sistema/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
