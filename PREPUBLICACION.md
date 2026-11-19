@@ -31,11 +31,11 @@ El titular ha elegido MIT. El texto completo está en LICENSE, con autoría de J
 
 Referencia: https://choosealicense.com/licenses/mit/
 
-## Qué falta antes de anunciar la publicación
+## Publicación y comprobaciones pendientes
 
 - Licencia y autoría elegidas: MIT, Jesús (completado).
 - Repositorio público creado: https://github.com/JLInF97/menu-compra-ha. Se publican código, gráficos aprobados, licencia, documentación y pruebas; se excluyen claves, datos, cachés, evidencias locales y contratos internos de desarrollo.
-- Subir el workflow y comprobar su primera ejecución real en GitHub Actions. Preparado/validado localmente no significa ejecutado en GitHub.
+- Primera ejecución real de GitHub Actions completada correctamente: https://github.com/JLInF97/menu-compra-ha/actions/runs/44622830112. Los trabajos Python3.12/3.14 (477 pruebas cada uno, Chromium y ZIP extraídos) y contenedores amd64/arm64 finalizaron con éxito. Arm64 usa QEMU, no hardware HA físico.
 - Validar aarch64 antes de anunciarla como arquitectura probada. El job Docker arm64 mediante QEMU aporta una comprobación técnica adicional, no una prueba completa en hardware con HA.
 
 La revisión de seguridad y política de mantenimiento públicas pueden hacerse por separado; las comprobaciones existentes no se presentan como auditoría independiente.

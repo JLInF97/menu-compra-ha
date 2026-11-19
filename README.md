@@ -1,5 +1,7 @@
 # Menú y Compra para Home Assistant OS
 
+<img src="menu_compra/icon.png" alt="Icono de Menú y Compra" width="96" height="96">
+
 [![Pruebas](https://github.com/JLInF97/menu-compra-ha/actions/workflows/ci.yml/badge.svg)](https://github.com/JLInF97/menu-compra-ha/actions/workflows/ci.yml)
 
 App local en castellano para planificar el menú semanal, mantener una lista de la compra compartida y consultar precios por supermercado. FastAPI + SQLite + HTML/CSS/JavaScript, sin compilación del frontend, CDN ni servicios de IA.
@@ -24,7 +26,7 @@ Para actualizar desde la app 0.6.0, copia primero la integración 1.0.0 bajo `/c
 
 El icono elegido se muestra dentro de la app, como favicon/acceso directo y en su ficha de la tienda. La barra lateral del propio Home Assistant sigue usando `panel_icon` MDI, conforme a su plataforma; no se modifica la interfaz padre de HA.
 
-Para instalar utiliza **`menu-compra-ha-1.0.0-instalar.zip`**: al descomprimir aparece directamente `menu_compra/`. El ZIP de fuentes `menu-compra-ha-1.0.0.zip` incluye además pruebas, arranque Windows y evidencias. Sustituye los archivos y actualiza: no desinstales ni borres los datos. Haz una copia antes: SQLite y el JSON de copia se mantienen en versiones 4 y 3, respectivamente. La categoría antigua «Sin categoría» se unifica como «Sin especificar» conservando sus productos.
+Para instalar utiliza **`menu-compra-ha-1.0.0-instalar.zip`**: al descomprimir aparece directamente `menu_compra/`. El ZIP de fuentes `menu-compra-ha-1.0.0.zip` incluye además pruebas, arranque Windows y herramientas de verificación. Sustituye los archivos y actualiza: no desinstales ni borres los datos. Haz una copia antes: SQLite y el JSON de copia se mantienen en versiones 4 y 3, respectivamente. La categoría antigua «Sin categoría» se unifica como «Sin especificar» conservando sus productos.
 
 **Corregido el error de 0.1.0 «dockerfile is missing»:** el ZIP anterior omitía por error `Dockerfile`, que no tiene extensión. El empaquetador ahora lo incluye y valida los archivos obligatorios **dentro de ambos ZIP**, no solo en la carpeta fuente. No se necesita ejecutar `ha supervisor repair` para reparar este defecto del paquete. Sustituye la carpeta completa de la app sin desinstalarla ni borrar `/data`.
 
@@ -110,7 +112,7 @@ python -m pytest -q
 
 ## Empaquetado y estado de validación
 
-Las instrucciones reproducibles y la integración continua están en [PRUEBAS.md](PRUEBAS.md). No requieren rutas personales, Edge ni fuentes de Windows. El workflow de GitHub Actions ejecuta pruebas en Python3.12/3.14, navegador Chromium, verificación de ZIP extraídos y smoke de contenedores amd64/arm64. Los paquetes de desarrollo se generan en build/dist, no sobre las entregas de dist/. Su preparación no implica que ya haya corrido en GitHub.
+Las instrucciones reproducibles y la integración continua están en [PRUEBAS.md](PRUEBAS.md). No requieren rutas personales, Edge ni fuentes de Windows. El workflow de GitHub Actions ejecuta pruebas en Python3.12/3.14, navegador Chromium, verificación de ZIP extraídos y smoke de contenedores amd64/arm64. Los paquetes de desarrollo se generan en build/dist, no sobre las entregas de dist/. La [primera ejecución en GitHub](https://github.com/JLInF97/menu-compra-ha/actions/runs/44622830112) terminó correctamente: Python3.12/3.14, Chromium, paquetes y contenedores Linux amd64/arm64 (arm64 mediante QEMU). Esto no sustituye la comprobación en un Home Assistant físico aarch64.
 
 `menu_compra/config.yaml` declara `amd64` y `aarch64`, Ingress en el puerto interno 8099, panel para usuarios no administradores y copia SQLite en frío. No hay puertos publicados, red del anfitrión ni permisos de API de Home Assistant/Supervisor. `Dockerfile` utiliza `FROM python:3.12-slim` directamente, sin `build.yaml` ni Bashio/S6; `init: true` permite al Supervisor añadir su init.
 

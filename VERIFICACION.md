@@ -4,7 +4,11 @@
 
 El usuario confirma que ha realizado las pruebas solicitadas en un Home Assistant de test y todo funciona. No ha probado aarch64. Se trata de una validación manual del usuario, no de ejecución del agente en su equipo. La preparación de pruebas portables y CI está en PRUEBAS.md y PREPUBLICACION.md. Los informes nuevos se generan en build/ y se mantienen separados de los resultados del cierre original descritos a continuación.
 
-## Alcance
+## Primera publicación en GitHub
+
+Licencia MIT y repositorio https://github.com/JLInF97/menu-compra-ha. La primera ejecución real de CI (https://github.com/JLInF97/menu-compra-ha/actions/runs/44622830112) completó correctamente los cuatro trabajos: Python3.12/3.14 con 477 pruebas cada uno, navegador y paquetes extraídos, y contenedores Linux amd64/arm64. El smoke verifica salud, denegación de acceso directo/spoofing y persistencia al reiniciar. Arm64 se ejecuta mediante QEMU; sigue pendiente HA en hardware aarch64. Los límites Docker descritos más abajo corresponden al entorno local anterior, no a esta ejecución remota.
+
+## Alcance del cierre original
 
 Consolidación de la interfaz y funciones aceptadas, incluido Telegram semanal de lunes a domingo y fechas DD/MM/YY. Se aplica el icono aprobado AB a la marca de la app, favicon/acceso directo e icon.png/logo.png para Supervisor. No se añaden funcionalidades ni se rediseña la interfaz.
 

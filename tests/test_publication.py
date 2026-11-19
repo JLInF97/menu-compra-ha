@@ -38,4 +38,6 @@ def test_installer_archive_really_contains_mit(tmp_path):
     target = tmp_path / 'installer.zip'
     build_archive(target, [ROOT / name for name in REQUIRED])
     with zipfile.ZipFile(target) as archive:
-        assert archive.read('menu_compra/LICENSE').decode('utf-8').strip() == (ROOT / 'LICENSE').read_text(encoding='utf-8').strip()
+        actual = archive.read('menu_compra/LICENSE').decode('utf-8').strip().splitlines()
+        expected = (ROOT / 'LICENSE').read_text(encoding='utf-8').strip().splitlines()
+        assert actual == expected
