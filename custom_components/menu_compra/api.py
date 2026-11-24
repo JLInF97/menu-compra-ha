@@ -125,8 +125,10 @@ class BridgeClient:
 
     async def health(self):
         data = await self._request("GET", "health")
-        if not isinstance(data, dict) or data.get("status") != "ok" or data.get("version") not in {"0.6.0", "1.0.0"}:
-            raise BridgeError("Se necesita un bridge compatible de Menú y Compra 0.6.0 o 1.0.0.")
+        if (not isinstance(data, dict) or data.get("status") != "ok"
+                or not isinstance(data.get("version"), str)
+                or data["version"] not in {"0.6.0", "1.0.0", "1.1.0"}):
+            raise BridgeError("Se necesita un bridge compatible de Menú y Compra.")
         return data
 
     async def shopping(self):

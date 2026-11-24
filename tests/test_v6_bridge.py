@@ -31,7 +31,8 @@ def test_default_disabled_and_cannot_be_bypassed_even_in_dev(tmp_path):
     for development in (True, False):
         with TestClient(create_app(tmp_path, development=development), client=SUPERVISOR) as client:
             assert client.get('/api/ha/status').json() == {
-                "enabled": False, "has_token": False, "base_url": "http://local-menu-compra:8099", "protocol_version": 1}
+                "enabled": False, "has_token": False, "base_url": "", "protocol_version": 1,
+                "automatic": False, "discovery_state": "unavailable"}
             assert client.get('/bridge/v1/health').status_code == 404
             assert client.get('/bridge/v1/health', headers={"Authorization": "Bearer invalid"}).status_code == 404
     assert not (tmp_path / 'ha_bridge.json').exists()
@@ -78,7 +79,7 @@ def test_bridge_requires_own_bearer_from_all_peers(app, authorization):
 def test_persist_rotate_disable_reenable_restart_no_token_in_exports(app, tmp_path):
     auth = enable(app)
     with TestClient(app, client=CORE, headers=auth) as core:
-        assert core.get('/bridge/v1/health').json() == {"status": "ok", "version": "1.0.0"}
+        assert core.get('/bridge/v1/health').json() == {"status": "ok", "version": "1.1.0"}
     original_token = auth['Authorization'].split(' ', 1)[1]
     with TestClient(app, client=SUPERVISOR, headers=CSRF) as ui:
         assert original_token not in ui.get('/api/ha/status').text

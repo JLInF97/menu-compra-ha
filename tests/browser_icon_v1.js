@@ -44,7 +44,7 @@ const check = (condition,name) => {assert.ok(condition,name);result.cases.push(n
   const links=await app.locator('link[rel="icon"],link[rel="apple-touch-icon"]').evaluateAll(nodes=>nodes.map(node=>node.href));
   check(links.length===5&&links.every(url=>url.includes(prefix+'static/')),'all-favicons-preserve-ingress-prefix');
   for(const url of links){const response=await page.request.get(url);check(response.ok(),'favicon-http-'+new URL(url).pathname.split('/').at(-1));}
-  check((await app.locator('#app-version').textContent())==='v1.0.0','stable-version-visible');
+  check((await app.locator('#app-version').textContent())==='v1.1.0','stable-version-visible');
   for(const width of [320,390,850,851,1280]) {
    await page.setViewportSize({width,height:900});
    check(await app.locator('html').evaluate(el=>el.scrollWidth<=innerWidth),`no-overflow-${width}`);

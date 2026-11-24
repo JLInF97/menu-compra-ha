@@ -1,13 +1,13 @@
 {
   "name": "menu-compra-checks",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "license": "MIT",
   "description": "Herramientas de pruebas; no son dependencias de la aplicación",
   "engines": { "node": ">=22" },
   "scripts": {
     "test:browser": "python tools/run_browser_tests.py",
-    "check:js": "node --check menu_compra/app/static/app.js && node --check tests/browser_support.js && node --check tests/browser_v5_1.js && node --check tests/browser_v6.js && node --check tests/browser_icon_v1.js"
+    "check:js": "node --check menu_compra/app/static/app.js && node --check tests/browser_support.js && node --check tests/browser_v5_1.js && node --check tests/browser_v6.js && node --check tests/browser_icon_v1.js && node --check tests/browser_auto_setup.js"
   },
   "devDependencies": { "playwright": "1.65.1" }
 }

@@ -249,9 +249,9 @@ def expected_upgrade(old_tables, system_ids=None):
 
 def test_bootstrap_reports_v4_and_preserves_existing_fields(client):
     data = ok(client.get("/api/bootstrap"))
-    assert data.get("version") == "1.0.0", data
+    assert data.get("version") == "1.1.0", data
     assert {"categories", "supermarkets", "products", "dishes"} <= data.keys()
-    assert ok(client.get("/api/health")) == {"status": "ok", "version": "1.0.0"}
+    assert ok(client.get("/api/health")) == {"status": "ok", "version": "1.1.0"}
     assert backup(client)["version"] == 3
     assert_integrity(client)
 

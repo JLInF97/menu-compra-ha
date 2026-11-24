@@ -51,7 +51,7 @@ def test_http_probe_against_real_production_http(production_server):
     result = run_probe(checker.HTTP_PROBE, production_server)
     assert result.returncode == 0, result.stderr
     report = json.loads(result.stdout)
-    assert report["health"] == {"status": "ok", "version": "1.0.0"}
+    assert report["health"] == {"status": "ok", "version": "1.1.0"}
     assert len(report["denied"]) == 20
     assert all(check["status"] == 403 for check in report["denied"])
     assert report["bridge_disabled"] is True

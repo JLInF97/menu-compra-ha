@@ -1,4 +1,12 @@
-# Verificación de Menú y Compra 1.0.0 — cierre estable
+# Verificación de Menú y Compra
+
+## Enlace automático1.1.0
+
+La app identifica su hostname mediante Supervisor y anuncia credenciales por su canal autenticado. El flujo normal no exige URL ni clave; se conserva un modo manual avanzado. Primero se actualiza el componente personalizado y se reinicia Core, después se actualiza la app sin borrar datos ni credenciales. Consulta ENLACE_AUTOMATICO.md.
+
+Validación local en Windows: 590 pruebas correctas en Python3.12 y3.14; una prueba de AF_UNIX omitida por plataforma y destinada a Linux CI. 82 comprobaciones Chromium correctas, incluido el enlace automático con Supervisor HTTP fixture y backend/SQLite reales. Los paquetes extraídos también se ejercitan. Ruff, sintaxis y comprobación de rutas pasan. Las fixtures no equivalen a una ejecución real de Core/Supervisor ni a instalación en el HA del usuario; se mantienen separadas de la comprobación manual previa de1.0.0. Los resultados de GitHub están disponibles en Actions y las notas de cada release.
+
+## Histórico de1.0.0 — cierre estable
 
 ## Actualización de prepublicación
 

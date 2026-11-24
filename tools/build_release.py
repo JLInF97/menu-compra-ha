@@ -8,12 +8,13 @@ from io import BytesIO
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 REQUIRED = [
     "menu_compra/config.yaml", "menu_compra/Dockerfile", "menu_compra/run.sh", "menu_compra/LICENSE",
     "menu_compra/requirements.txt", "menu_compra/app/__init__.py", "menu_compra/app/main.py", "menu_compra/app/db.py",
     "menu_compra/app/models.py", "menu_compra/app/backup.py",
     "menu_compra/app/ha_bridge.py",
+    "menu_compra/app/supervisor_discovery.py",
     "menu_compra/app/static/index.html", "menu_compra/app/static/app.js", "menu_compra/app/static/style.css",
     "menu_compra/DOCS.md",
     "menu_compra/icon.png", "menu_compra/logo.png", "menu_compra/app/static/favicon.ico",
@@ -21,11 +22,12 @@ REQUIRED = [
     "menu_compra/app/static/icons/icon-192.png", "menu_compra/app/static/icons/icon-512.png",
 ]
 SUFFIXES = {".py", ".html", ".js", ".css", ".yaml", ".yml", ".txt", ".md", ".sh", ".toml", ".cmd", ".json", ".xml", ".png", ".ico"}
-PRIVATE_NAMES = {"ha_bridge.json", "secrets.yaml", "options.json"}
+PRIVATE_NAMES = {"ha_bridge.json", "ha_discovery.json", "secrets.yaml", "options.json"}
 HA_REQUIRED = ["custom_components/menu_compra/__init__.py", "custom_components/menu_compra/config_flow.py",
                "custom_components/menu_compra/manifest.json", "custom_components/menu_compra/services.yaml", "custom_components/menu_compra/LICENSE",
+               "custom_components/menu_compra/discovery.py",
                "custom_components/menu_compra/strings.json", "custom_components/menu_compra/translations/es.json",
-               "blueprints/automation/menu_compra/telegram.yaml", "HA_TELEGRAM.md"]
+               "blueprints/automation/menu_compra/telegram.yaml", "HA_TELEGRAM.md", "ENLACE_AUTOMATICO.md", "LICENSE"]
 
 
 def collect_files(root=ROOT):
@@ -37,7 +39,7 @@ def collect_files(root=ROOT):
         for path in base.rglob("*"):
             if path.is_file() and not path.is_symlink() and path.name not in PRIVATE_NAMES and (path.suffix in SUFFIXES or path.name in {"Dockerfile", ".dockerignore", "LICENSE", "NOTICE"}) and "__pycache__" not in path.parts:
                 files.append(path)
-    for filename in ("README.md", "CONTRACT.md", "CHANGES-0.2.0.md", "CHANGES-0.3.0.md", "CHANGES-0.4.0.md", "CHANGES-0.5.0.md", "CHANGES-0.5.1.md", "CHANGES-0.6.0.md", "CHANGES-0.6.1.md", "CHANGES-1.0.0.md", "CIERRE-1.0.0.md", "HA_TELEGRAM.md", "requirements-dev.txt", "requirements-ci.lock", "package.json", "package-lock.json", "PRUEBAS.md", "PREPUBLICACION.md", "pyproject.toml", "iniciar-local.cmd", "VERIFICACION.md", ".gitignore", ".gitattributes", "repository.yaml", "CONTRIBUTING.md", "LICENSE", "LICENSE.md", "LICENSE.txt"):
+    for filename in ("README.md", "CONTRACT.md", "CHANGES-0.2.0.md", "CHANGES-0.3.0.md", "CHANGES-0.4.0.md", "CHANGES-0.5.0.md", "CHANGES-0.5.1.md", "CHANGES-0.6.0.md", "CHANGES-0.6.1.md", "CHANGES-1.1.0.md", "CIERRE-1.0.0.md", "HA_TELEGRAM.md", "requirements-dev.txt", "requirements-ci.lock", "package.json", "package-lock.json", "PRUEBAS.md", "PREPUBLICACION.md", "pyproject.toml", "iniciar-local.cmd", "VERIFICACION.md", ".gitignore", ".gitattributes", "repository.yaml", "CONTRIBUTING.md", "ENLACE_AUTOMATICO.md", "LICENSE", "LICENSE.md", "LICENSE.txt"):
         path = root / filename
         if path.exists():
             files.append(path)
@@ -126,7 +128,7 @@ def main():
     source = build_archive(args.output_dir / f"menu-compra-ha-{VERSION}.zip", files, prefix="menu-compra-ha/")
     addon_files = [path for path in files if path.is_relative_to(ROOT / "menu_compra")]
     installer = build_archive(args.output_dir / f"menu-compra-ha-{VERSION}-instalar.zip", addon_files)
-    ha_files = [path for path in files if path.is_relative_to(ROOT / "custom_components") or path.is_relative_to(ROOT / "blueprints") or path.name == "HA_TELEGRAM.md"]
+    ha_files = [path for path in files if path.is_relative_to(ROOT / "custom_components") or path.is_relative_to(ROOT / "blueprints") or path.name in {"HA_TELEGRAM.md", "ENLACE_AUTOMATICO.md"} or path == ROOT / "LICENSE"]
     ha = build_archive(args.output_dir / f"menu-compra-ha-{VERSION}-integracion.zip", ha_files, kind="ha")
     print(json.dumps({"version": VERSION, "artifacts": [installer, ha, source]}, ensure_ascii=False, indent=2))
 

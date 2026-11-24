@@ -3,65 +3,116 @@
   "config": {
     "step": {
       "user": {
-        "title": "Conectar Menú y Compra",
-        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "title": "Enlazar Menú y Compra",
+        "description": "El enlace se obtiene automáticamente de Supervisor sin escribir URL ni clave. El componente personalizado debe estar instalado y Core reiniciado una vez. Fuera de Supervisor usa la opción manual avanzada.",
+        "menu_options": {
+          "automatic": "Buscar enlace automático",
+          "manual": "Configuración manual avanzada"
+        }
+      },
+      "automatic": {
+        "title": "Enlace automático",
+        "description": "Comprueba que la app está iniciada y su conexión con Home Assistant activada. Pulsa Enviar para volver a leer Supervisor; no necesitas URL ni clave.",
+        "data": {}
+      },
+      "select_app": {
+        "title": "Elegir instalación",
+        "description": "Se han encontrado varias instalaciones. Elige la app que contiene tus datos. No se trasladarán datos entre instalaciones.",
+        "data": {
+          "app_slug": "Instalación de Menú y Compra"
+        }
+      },
+      "manual": {
+        "title": "Configuración manual avanzada",
+        "description": "Solo para una conexión manual: indica el origen interno directo y la clave bridge de la app. No uses una URL Ingress ni la clave de Telegram. Deja la clave vacía para conservarla al editar.",
         "data": {
           "base_url": "URL interna de la aplicación",
-          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "api_key": "Clave bridge (vacía: conservar la actual)",
           "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
           "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
         }
       },
       "reconfigure": {
-        "title": "Conectar Menú y Compra",
-        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "title": "Configuración manual avanzada",
+        "description": "Solo para una conexión manual: indica el origen interno directo y la clave bridge de la app. No uses una URL Ingress ni la clave de Telegram. Deja la clave vacía para conservarla al editar.",
         "data": {
           "base_url": "URL interna de la aplicación",
-          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "api_key": "Clave bridge (vacía: conservar la actual)",
           "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
           "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
         }
       },
       "reauth_confirm": {
-        "title": "Conectar Menú y Compra",
-        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "title": "Configuración manual avanzada",
+        "description": "Solo para una conexión manual: indica el origen interno directo y la clave bridge de la app. No uses una URL Ingress ni la clave de Telegram. Deja la clave vacía para conservarla al editar.",
         "data": {
           "base_url": "URL interna de la aplicación",
-          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "api_key": "Clave bridge (vacía: conservar la actual)",
           "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
           "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
         }
       }
     },
     "error": {
-      "invalid_auth": "Bridge desactivado o clave no válida. Actívalo y copia su clave actual.",
-      "cannot_connect": "No se pudo conectar con el bridge 0.6.0. Comprueba URL interna, red y versión.",
-      "invalid_settings": "Revisa URL, clave completa, entidad Telegram y chats (IDs enteros, incluidos negativos para grupos)."
+      "invalid_auth": "Bridge desactivado o conexión revocada. Activa la conexión de la app y vuelve a intentarlo.",
+      "cannot_connect": "No se pudo conectar con el bridge. Comprueba que la app está iniciada y accesible.",
+      "invalid_settings": "Revisa URL, clave completa, entidad Telegram y chats (IDs enteros, incluidos negativos para grupos).",
+      "supervisor_unavailable": "Supervisor no está disponible. Vuelve a intentarlo; fuera de una instalación supervisada puedes usar la configuración manual avanzada.",
+      "no_discoveries": "No se ha encontrado una app anunciada. Inicia la app y activa su conexión con Home Assistant.",
+      "invalid_discovery": "El anuncio no es válido o hay anuncios contradictorios. Revisa la app y vuelve a intentarlo.",
+      "discovery_changed": "El anuncio ha cambiado. Vuelve a intentarlo para recuperar la conexión actual.",
+      "invalid_selection": "Selecciona una de las instalaciones anunciadas.",
+      "different_installation": "Esta entrada pertenece a otra instalación. No se han sustituido sus datos. Para cambiar de app, elimina la integración y configúrala de nuevo."
     },
     "abort": {
       "single_instance_allowed": "Solo se permite una instancia. Usa Configurar o Reconfigurar la existente.",
       "already_configured": "Ya está configurado.",
       "reconfigure_successful": "Conexión reconfigurada.",
-      "reauth_successful": "Clave actualizada."
+      "reauth_successful": "Conexión recuperada.",
+      "automatic_updated": "Enlace automático actualizado. Se han conservado la entrada y las opciones Telegram.",
+      "different_installation": "Esta entrada pertenece a otra instalación. No se han sustituido sus datos. Para cambiar de app, elimina la integración y configúrala de nuevo.",
+      "invalid_discovery": "El anuncio no es válido o hay anuncios contradictorios. Revisa la app y vuelve a intentarlo."
     }
   },
   "options": {
     "step": {
       "init": {
-        "title": "Conectar Menú y Compra",
-        "description": "Activa la conexión en Datos y ajustes de la app 0.6.0 y copia la clave bridge. No uses la clave de Telegram ni una URL Ingress. La clave no se muestra de nuevo. Selecciona la entidad de eventos del bot existente solo si vas a usar Telegram.",
+        "title": "Configurar Menú y Compra",
+        "description": "El enlace automático conserva la conexión. Configura Telegram o abre los controles manuales avanzados.",
+        "menu_options": {
+          "telegram": "Telegram",
+          "advanced": "Configuración manual avanzada"
+        }
+      },
+      "telegram": {
+        "title": "Telegram",
+        "description": "Selecciona la entidad del bot existente y los chats permitidos. Dejar los campos vacíos desactiva Telegram; no cambia el enlace con la app.",
+        "data": {
+          "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
+          "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
+        }
+      },
+      "advanced": {
+        "title": "Configuración manual avanzada",
+        "description": "Solo para una conexión manual: indica el origen interno directo y la clave bridge de la app. No uses una URL Ingress ni la clave de Telegram. Deja la clave vacía para conservarla al editar.",
         "data": {
           "base_url": "URL interna de la aplicación",
-          "api_key": "Clave bridge (en opciones, dejar vacía para conservarla)",
+          "api_key": "Clave bridge (vacía: conservar la actual)",
           "telegram_event_entity": "Entidad de eventos Telegram (opcional)",
           "allowed_chats": "Chats permitidos, separados por comas (vacío: Telegram desactivado)"
         }
       }
     },
     "error": {
-      "invalid_auth": "Bridge desactivado o clave no válida.",
-      "cannot_connect": "No se pudo conectar con el bridge 0.6.0.",
-      "invalid_settings": "Revisa URL, clave, entidad Telegram y lista de chats."
+      "invalid_auth": "Bridge desactivado o conexión revocada. Activa la conexión de la app y vuelve a intentarlo.",
+      "cannot_connect": "No se pudo conectar con el bridge. Comprueba que la app está iniciada y accesible.",
+      "invalid_settings": "Revisa URL, clave completa, entidad Telegram y chats (IDs enteros, incluidos negativos para grupos).",
+      "supervisor_unavailable": "Supervisor no está disponible. Vuelve a intentarlo; fuera de una instalación supervisada puedes usar la configuración manual avanzada.",
+      "no_discoveries": "No se ha encontrado una app anunciada. Inicia la app y activa su conexión con Home Assistant.",
+      "invalid_discovery": "El anuncio no es válido o hay anuncios contradictorios. Revisa la app y vuelve a intentarlo.",
+      "discovery_changed": "El anuncio ha cambiado. Vuelve a intentarlo para recuperar la conexión actual.",
+      "invalid_selection": "Selecciona una de las instalaciones anunciadas.",
+      "different_installation": "Esta entrada pertenece a otra instalación. No se han sustituido sus datos. Para cambiar de app, elimina la integración y configúrala de nuevo."
     }
   }
 }

@@ -32,13 +32,13 @@ def blueprint():
 
 def test_manifest_translations_services_blueprint_are_consistent():
     manifest = json.loads((COMPONENT / "manifest.json").read_text(encoding="utf-8"))
-    assert manifest["domain"] == "menu_compra" and manifest["version"] == "1.0.0"
-    assert manifest["config_flow"] is True and manifest["single_config_entry"] is True
-    assert manifest["requirements"] == [] and manifest["after_dependencies"] == ["telegram_bot"]
+    assert manifest["domain"] == "menu_compra" and manifest["version"] == "1.1.0"
+    assert manifest["config_flow"] is True and manifest.get("single_config_entry", False) is False
+    assert manifest["requirements"] == [] and set(manifest["after_dependencies"]) == {"hassio", "telegram_bot"}
     strings = json.loads((COMPONENT / "strings.json").read_text(encoding="utf-8"))
     assert strings == json.loads((COMPONENT / "translations/es.json").read_text(encoding="utf-8"))
-    assert set(strings["config"]["step"]) == {"user", "reconfigure", "reauth_confirm"}
-    assert "init" in strings["options"]["step"]
+    assert set(strings["config"]["step"]) == {"user", "automatic", "select_app", "manual", "reconfigure", "reauth_confirm"}
+    assert set(strings["options"]["step"]) == {"init", "telegram", "advanced"}
     descriptions = yaml.safe_load((COMPONENT / "services.yaml").read_text(encoding="utf-8"))
     assert set(descriptions) == EXPECTED_SERVICES
     for value in descriptions.values():

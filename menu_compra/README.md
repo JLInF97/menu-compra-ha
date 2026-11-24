@@ -1,6 +1,10 @@
 # Menú y Compra
 
-En 1.0.0 puedes habilitar una conexión interna desde Datos y ajustes para controlarla con acciones de Home Assistant y con tu integración Telegram Bot existente. El paquete adicional de integración y blueprint se instala bajo `/config` de HA, no dentro de esta carpeta. La interfaz web y la base de datos siguen siendo las mismas; la conexión está desactivada inicialmente y no publica puertos.
+En **1.1.0** la conexión con Home Assistant es automática bajo Supervisor: instala/inicia la app, copia el componente **1.1.0** a `/config/custom_components/menu_compra/` y **reinicia Core**. La entrada se crea sin escribir URL ni copiar claves. El componente requiere esa copia manual; la app no puede instalarlo sola. La interfaz y los datos no cambian, ni se publican puertos. [Guía de enlace automático](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md) y [Telegram](https://github.com/JLInF97/menu-compra-ha/blob/main/HA_TELEGRAM.md).
+
+Una app nueva genera su clave y activa la conexión al arrancar bajo Supervisor. Una actualización conserva la clave y el estado anterior: si estaba desactivada, pulsa **Activar** en Datos y ajustes para usarla. `announced` solo confirma aceptación del anuncio por Supervisor, no que Core haya terminado de enlazar. Si Core no está disponible o falta el componente, hay reintentos sin bloquear la app ni cambiar la clave.
+
+Con una sola app no hay campos de conexión; si hay varias debes elegir. Telegram sigue siendo opcional: configura la entidad de eventos, una lista explícita de chats permitidos y su automatización. El descubrimiento no autoriza chats ni grupos. El modo manual solo está en **Configuración manual avanzada**, para Docker/desarrollo/migraciones especiales.
 
 Aplicación local para **Home Assistant OS**, en castellano, con menú semanal, lista de la compra e historial de precios. Se abre dentro de Home Assistant mediante **Ingress**, sin publicar puertos ni crear otra cuenta.
 
@@ -29,14 +33,16 @@ Los datos se guardan en SQLite en `/data/menu_compra.sqlite3`. No hay productos 
 3. Busca **Menú y Compra** entre las aplicaciones locales y pulsa **Instalar**. Se compila en el propio equipo: espera a que termine.
 4. Pulsa **Iniciar**, revisa **Registro** y activa **Mostrar en la barra lateral**. Abre **Interfaz web** o la entrada **Menú y compra**.
 
-Puedes añadir `https://github.com/JLInF97/menu-compra-ha` a Repositorios de la tienda. Si ya usas la instalación local, no la sustituyas sin planificar una migración: los dos orígenes tienen identificadores y datos separados. No copies únicamente los archivos de `app/`, ni coloques el proyecto en `/config`.
+Puedes añadir `https://github.com/JLInF97/menu-compra-ha` a Repositorios de la tienda. Si ya usas la instalación local, no la sustituyas sin planificar una migración: los dos orígenes tienen identificadores, datos y claves separados; no se migra ni se cambia de app silenciosamente. Exporta/restaura y elige explícitamente la instalación que quieres enlazar. No copies únicamente los archivos de `app/`, ni coloques el proyecto en `/config` (solo el componente y el blueprint van allí).
 
-**Guía completa:** [instalación, uso, copias y resolución de problemas](DOCS.md). El ZIP de fuentes incluye también el arranque local en Windows y las pruebas.
+**Actualizar desde 1.0.0:** haz copia; sustituye primero el componente por 1.1.0 y reinicia Core; después actualiza la misma app a 1.1.0. Conserva su slug y `/data`; no desinstales ni recrees la entrada o la automatización. Se conservan clave, ID y opciones Telegram de la misma instalación, incluido el estado desactivado.
+
+**Guía completa:** [instalación, uso, copias y resolución de problemas](DOCS.md). El ZIP de fuentes incluye también el arranque local en Windows y las pruebas. [Repositorio](https://github.com/JLInF97/menu-compra-ha) · [Releases](https://github.com/JLInF97/menu-compra-ha/releases) · [Licencia MIT](LICENSE).
 
 La versión **0.2.0** corrige el ZIP de 0.1.0, que omitía `Dockerfile`. Comprueba que `Dockerfile` y `config.yaml` estén juntos en esta carpeta. No necesitas reparar el Supervisor por ese defecto del ZIP anterior.
 
 ## Compatibilidad y límites
 
-Empaquetada para `amd64` y `aarch64`, con `python:3.12-slim`. Acceso solo por Ingress; no necesita la API de Home Assistant ni del Supervisor. `panel_admin: false` permite mostrar el panel a usuarios no administradores; todos comparten y pueden modificar los mismos datos, incluidas las restauraciones.
+Empaquetada para `amd64` y `aarch64`, con `python:3.12-slim`. Acceso web solo por Ingress; el descubrimiento usa Supervisor sin permisos ampliados `hassio_api`/`homeassistant_api`, red del anfitrión ni puertos publicados. `panel_admin: false` permite mostrar el panel a usuarios no administradores; todos comparten y pueden modificar los mismos datos, incluidas las restauraciones.
 
-Versión 1.0.0 estable. El usuario confirma que las pruebas solicitadas funcionan en un Home Assistant de test. No ha probado aarch64. Esta confirmación manual no equivale a ejecución del agente en HA ni a resultados del workflow de CI. Consulta [las comprobaciones y límites](DOCS.md#comprobaciones-y-límites).
+Documentación de **1.1.0**. La confirmación manual del usuario en un Home Assistant de test pertenece a **1.0.0**, sin prueba en hardware aarch64; no verifica el nuevo enlace automático. Las pruebas de CI/paquetes de 1.1.0 deberán tener evidencias propias y sigue pendiente la validación en Core/Supervisor real. Consulta [las comprobaciones y límites](DOCS.md#comprobaciones-y-límites).

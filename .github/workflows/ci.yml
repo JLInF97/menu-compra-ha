@@ -51,7 +51,7 @@ jobs:
           mkdir -p build/test-evidence
           python -c "import probatio; print('probatio importado correctamente')"
           python -m pytest -q --junitxml=build/test-evidence/pytest.xml
-      - name: Tres escenarios con Chromium real
+      - name: Regresión y enlace automático con Chromium real
         run: npm run test:browser
       - name: Crear paquetes nuevos sin modificar dist
         run: python tools/build_release.py --output-dir build/ci-dist

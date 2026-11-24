@@ -1,5 +1,5 @@
 name: "Menú y Compra"
-version: "1.0.0"
+version: "1.1.0"
 slug: "menu_compra"
 url: "https://github.com/JLInF97/menu-compra-ha"
 description: "Menú semanal, lista de la compra e historial de precios compartidos."
@@ -19,6 +19,9 @@ panel_title: "Menú y compra"
 panel_admin: false
 # SQLite se copia con la aplicación detenida.
 backup: cold
+# Solo anuncios internos de descubrimiento; no da acceso a la API general.
+discovery:
+  - menu_compra
 environment:
   MENU_COMPRA_DATA_DIR: /data
 options: {}

@@ -23,7 +23,7 @@ En Linux puede hacer falta `npx playwright install --with-deps chromium`. En CI 
 
 `sh -n` requiere un shell POSIX (Linux/macOS o Git Bash en Windows). `npm run test:browser` usa el Python del entorno activado. Como alternativa explícita usa `python tools/run_browser_tests.py --output build/browser-evidence`.
 
-Los tres escenarios cubren regresión funcional, gestión de la clave y marca/favicon bajo proxy Ingress. Crean sus propios datos y puertos loopback efímeros; cierran servidores y no acceden al HA del usuario. Informes/capturas en build/browser-evidence, incluido summary.json. Los fallos devuelven código distinto de0, no se convierten en éxitos.
+Los escenarios cubren regresión funcional, gestión de la clave en modo avanzado, marca/favicon bajo proxy Ingress y enlace automático con una fixture HTTP de Supervisor expresamente identificada. El backend/SQLite y las peticiones HTTP son reales; la fixture no es un Home Assistant ni un Supervisor real. Crean sus propios datos y puertos loopback efímeros; cierran servidores y no acceden al HA del usuario. Informes/capturas en build/browser-evidence, incluido summary.json. Los fallos devuelven código distinto de0, no se convierten en éxitos.
 
 Los temporales usan el directorio temporal del sistema, respetando su configuración. `MENU_COMPRA_TEST_TMPDIR` permite elegir el directorio de los fixtures TCP. `PLAYWRIGHT_BROWSERS_PATH` permite mover la caché de navegadores. Solo como opción deliberada: `PLAYWRIGHT_EXECUTABLE_PATH` o `PLAYWRIGHT_CHANNEL` seleccionan otro navegador instalado; EDGE_PATH se conserva como alias antiguo, sin rutas predefinidas.
 
@@ -38,7 +38,7 @@ Se usan artwork/icono-maestro.png y artwork/logotipo-texto.png; no hay fuentes e
     python tools/build_release.py --output-dir build/ci-dist
     python tools/verify_release.py --dist-dir build/ci-dist --evidence-dir build/ci-release-evidence
 
-Activa MENU_COMPRA_VERIFY_UI=1 para repetir los tres escenarios de navegador sobre la app del instalador extraído. En shell POSIX:
+Activa MENU_COMPRA_VERIFY_UI=1 para repetir los escenarios de navegador sobre la app del instalador extraído. En shell POSIX:
 
     MENU_COMPRA_VERIFY_UI=1 python tools/verify_release.py --dist-dir build/ci-dist --evidence-dir build/ci-release-evidence
 
@@ -50,6 +50,10 @@ Los paquetes nuevos no sustituyen los de dist/. Las fuentes incluyen los locks, 
 
 Para ejecutarlo remotamente hay que subir el proyecto a un repositorio GitHub con Actions habilitado. Que el YAML exista o pase validación local NO significa que los jobs hayan terminado en GitHub. Un test de arm64 mediante QEMU tampoco sustituye la validación en un Home Assistant físico aarch64.
 
+## Enlace automático1.1.0
+
+Supervisor se simula mediante una fixture explícita en el escenario de navegador automático. El runner usa --supervisor-fixture y una fábrica solo de tests, fuera de la imagen de producción. Las pruebas de transporte y de flujo Core mantienen esa distinción. No instalan componentes en el HA del usuario ni necesitan sus credenciales.
+
 ## Estado de la prueba manual
 
-El usuario confirma que las pruebas solicitadas se realizaron en un Home Assistant de test y todo funciona. Esta es una confirmación del usuario, no una ejecución remota del agente. No ha probado aarch64; queda pendiente. No se han utilizado sus credenciales ni se ha modificado su instalación.
+El usuario confirmó que las pruebas de la versión1.0.0 se realizaron en un Home Assistant de test y todo funcionaba. Esa confirmación no valida por sí sola el nuevo enlace automático1.1.0, que se verifica por separado. Esta es una confirmación del usuario, no una ejecución remota del agente. No ha probado aarch64; queda pendiente. No se han utilizado sus credenciales ni se ha modificado su instalación.

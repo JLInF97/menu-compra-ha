@@ -58,7 +58,7 @@ def test_empty_bootstrap_and_categories(client):
     assert data["supermarkets"] == [{"id": 1, "name": "Sin especificar", "is_system": True}]
     assert data["categories"][-1]["name"] == "Congelados"
     assert data["categories"][-1]["is_frozen"] is True
-    assert client.get("/api/health").json() == {"status": "ok", "version": "1.0.0"}
+    assert client.get("/api/health").json() == {"status": "ok", "version": "1.1.0"}
     assert client.get("/api/shopping").json()["total_cents"] == 0
 
 

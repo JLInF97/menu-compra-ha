@@ -1,5 +1,15 @@
 # Registro de cambios
 
+## 1.1.0 — enlace automático con Home Assistant
+
+- En Supervisor, descubrimiento de la identidad real de la app y anuncio autenticado al componente personalizado: no hay que introducir URL ni copiar claves en el flujo normal. Sin host fijo, permisos ampliados de API, puertos publicados ni red del anfitrión.
+- El componente 1.1.0 se copia manualmente bajo `/config/custom_components/menu_compra/` y requiere reiniciar Core. Después se crea/actualiza la entrada automáticamente; con varias apps se exige elegir. No se instala código en `/config` desde la app.
+- App nueva bajo Supervisor: activación y clave automática. Actualizaciones: se respetan clave y estado, incluido `enabled: false`. Desactivar retira el anuncio; activar/rotar reanuncia. Reintentos por intervalo ante indisponibilidad sin bloquear la app ni rotar claves.
+- Estado de enlace automático en Datos y ajustes. `announced` solo significa aceptación del anuncio por Supervisor, no que Core haya terminado de configurar la entrada. Configuración manual reservada a la opción avanzada para Docker/desarrollo/migraciones especiales.
+- Para la misma app se mantienen ID de entrada y opciones Telegram; una entrada manual con la misma URL puede adoptarse. No se migra silenciosamente entre apps locales y de repositorio, cuyos identificadores y datos siguen separados. Telegram requiere entidad y chats permitidos explícitos; no se autorizan grupos automáticamente.
+- Actualización desde 1.0.0: copia de seguridad, componente 1.1.0 → reinicio Core → app 1.1.0, sin desinstalar, cambiar slug, borrar `/data`, regenerar clave o recrear automatizaciones. Se conservan interfaz, iconos y funciones aceptadas, protocolo bridge v1, SQLite 4 y JSON 3. Las entregas 1.0.0 no se modifican.
+- Documentación: [enlace automático](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md) y [Telegram](https://github.com/JLInF97/menu-compra-ha/blob/main/HA_TELEGRAM.md). Los resultados históricos de 1.0.0 no validan 1.1.0: CI y paquetes deberán tener evidencias propias; sigue pendiente probar el enlace en Core/Supervisor y Telegram reales, además de hardware aarch64.
+
 ## 1.0.0 — cierre estable
 
 - Icono aprobado: bolsa y plato de la propuesta B con los cubiertos de A. Incorporado a la marca de la app, favicon, iconos de acceso directo móvil y ficha/tienda de Supervisor.

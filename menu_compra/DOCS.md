@@ -7,15 +7,15 @@
 - Acceso de administrador para instalar la app y un medio para copiar archivos: Samba share o Terminal & SSH.
 - Conexión a Internet durante la instalación para descargar `python:3.12-slim` y las dependencias Python. Una vez instalada, la aplicación no necesita servicios externos para su funcionamiento normal.
 
-Es una versión inicial estable. Lee [las limitaciones de validación](#comprobaciones-y-límites) antes de confiarle la única copia de tus datos.
+Esta guía describe **1.1.0**. Lee [las limitaciones de validación](#comprobaciones-y-límites) antes de confiarle la única copia de tus datos. [Repositorio público](https://github.com/JLInF97/menu-compra-ha) · [Releases](https://github.com/JLInF97/menu-compra-ha/releases) · [Licencia MIT](LICENSE).
 
 ## Instalar como aplicación local
 
 ### Corregir «dockerfile is missing» en 0.1.0
 
-El ZIP de 0.1.0 omitía `Dockerfile` por un error de empaquetado. No indica por sí mismo corrupción del Supervisor. Usa **`menu-compra-ha-1.0.0-instalar.zip`**, cuyo directorio raíz es `menu_compra/`, y sustituye por completo los archivos de la carpeta local existente sin desinstalar la app ni borrar su almacenamiento.
+El ZIP de 0.1.0 omitía `Dockerfile` por un error de empaquetado. No indica por sí mismo corrupción del Supervisor. Para 1.1.0 usa **`menu-compra-ha-1.1.0-instalar.zip`**, cuyo directorio raíz es `menu_compra/`, y sustituye por completo los archivos de la carpeta local existente sin desinstalar la app ni borrar su almacenamiento. Consulta su disponibilidad en Releases; esta guía no certifica que el paquete esté publicado.
 
-Comprueba expresamente que **`Dockerfile` y `config.yaml` están juntos** en `/local_apps/menu_compra/` o `/addons/menu_compra/`. El nombre debe ser exactamente `Dockerfile`, sin `.txt` añadido y con la D mayúscula. Actualiza la tienda: debe mostrar la versión **1.0.0**. Si todavía no estaba instalada, pulsa Instalar; si ya lo estaba, Actualizar. No es necesario ejecutar `ha supervisor repair` por este defecto del paquete.
+Comprueba expresamente que **`Dockerfile` y `config.yaml` están juntos** en `/local_apps/menu_compra/` o `/addons/menu_compra/`. El nombre debe ser exactamente `Dockerfile`, sin `.txt` añadido y con la D mayúscula. Actualiza la tienda: debe mostrar la versión **1.1.0**. Si todavía no estaba instalada, pulsa Instalar; si ya lo estaba, Actualizar. No es necesario ejecutar `ha supervisor repair` por este defecto del paquete.
 
 La migración del menú de la versión anterior se realiza al arrancar, conservando sus entradas, catálogo, compra y precios. Haz una copia previa si ya tienes datos.
 
@@ -54,7 +54,7 @@ No copies solo `app/`; no crees un nivel extra como `menu_compra/menu_compra/con
 2. En el menú superior derecho pulsa **Buscar actualizaciones**; el texto puede aparecer como **Comprobar actualizaciones**.
 3. Recarga la página y busca **Menú y Compra** en **Aplicaciones locales** (antes, **Complementos locales**).
 
-También puedes instalar desde el repositorio público `https://github.com/JLInF97/menu-compra-ha`, añadiéndolo en Repositorios de la tienda. No cambies de instalación local a repositorio sin exportar/restaurar los datos y reconfigurar URL/clave del bridge: Home Assistant las considera apps distintas, con datos separados. La instalación existente puede seguir actualizándose manualmente.
+También puedes instalar desde el repositorio público `https://github.com/JLInF97/menu-compra-ha`, añadiéndolo en Repositorios de la tienda. No cambies de instalación local a repositorio como si fuera una actualización: son apps distintas con identificadores, datos y claves separados. Exporta/restaura y elige explícitamente qué instalación enlazar; no se migran los datos ni se reemplaza la entrada existente silenciosamente. La instalación local puede seguir actualizándose manualmente. [Guía de migración](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md#migrar-de-local-a-repositorio).
 
 ### 3. Instalar, iniciar y abrir
 
@@ -82,15 +82,17 @@ La ficha ofrece **Eliminar producto**, con confirmación. Borra el producto del 
 
 El borrado actúa sobre la base actual. No puede reescribir copias JSON, copias de Home Assistant ni archivos descargados previamente. SQLite usa `secure_delete` para reducir restos internos; no se promete borrado forense del disco o de copias externas.
 
-### Conectar con Home Assistant y Telegram (1.0.0)
+### Enlace automático con Home Assistant y Telegram (1.1.0)
 
-Esta función es opcional y parte de una conexión desactivada. En Datos y ajustes activa **Conectar con Home Assistant** y muestra la clave solo cuando vayas a copiarla en la integración. No es el token de Telegram ni un token de acceso de HA y no debe enviarse por mensajes ni pegarse en URLs.
+Instala/inicia la app 1.1.0; copia el componente 1.1.0 a `/config/custom_components/menu_compra/` y **reinicia Core**. Con una sola app descubierta la entrada se crea automáticamente en **Ajustes → Dispositivos y servicios**, sin escribir URL ni copiar claves. Con varias instalaciones hay que elegir, nunca se selecciona una arbitrariamente. El componente personalizado requiere esa copia manual una vez y su reemplazo al actualizar: la app no puede instalar código en `/config` por sí sola.
 
-El paquete `menu-compra-ha-1.0.0-integracion.zip` incluye `custom_components/menu_compra/` y el blueprint, para copiar bajo `/config` de Home Assistant. Reinicia Core tras instalar la integración y sigue su guía `HA_TELEGRAM.md`. Está diseñada para HA Core 2026.11.1 y utiliza la entidad de eventos de Telegram Bot. No añadas otro polling/webhook para el mismo bot.
+El paquete `menu-compra-ha-1.1.0-integracion.zip` incluye `custom_components/menu_compra/` y el blueprint para copiar bajo `/config`. Está dirigido a HA Core 2026.11.1. Tras el enlace, configura explícitamente en las opciones la entidad de eventos de Telegram Bot y los chats permitidos; crea la automatización del blueprint. Una lista vacía desactiva Telegram: **el descubrimiento no autoriza chats ni grupos**. No añadas otro polling/webhook para el mismo bot. [Guía Telegram, comandos y acciones](https://github.com/JLInF97/menu-compra-ha/blob/main/HA_TELEGRAM.md) · [Guía del enlace automático](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md).
 
-La URL interna de una instalación local es `http://local-menu-compra:8099`; desde la URL exacta del repositorio público anterior es `http://1872afc9-menu-compra:8099` (otras ramas/URLs cambian el prefijo). La app conserva la sugerencia local: usa la URL correspondiente a tu instalación; la API de máquina añade `/bridge/v1/` y exige Bearer propio. Solo admite las operaciones de menú y compra y las consultas de catálogo necesarias. No modifica las protecciones del acceso web ni habilita puertos del anfitrión. No es preciso publicar la API en Internet.
+Una app nueva bajo Supervisor activa la conexión y genera una clave al arrancar; los ajustes existentes conservan clave y estado. Si estaba desactivada (`enabled: false`), pulsa **Activar** solo si quieres usarla; no hay campos que rellenar. Supervisor proporciona la identidad real de la app, no se adivina un hostname ni un prefijo de repositorio. La API de máquina sigue limitada a menú, compra y consultas de catálogo con Bearer propio; no cambia las protecciones web ni habilita puertos. Docker sin Supervisor, desarrollo y migraciones especiales disponen de **Configuración manual avanzada**, no es el flujo normal.
 
-Desactivar impide nuevas llamadas y conserva la clave. Regenerar invalida la clave anterior y obliga a cambiarla en las opciones de la integración. Se guarda en `/data/ha_bridge.json`, excluido de exportaciones JSON de datos y de los instaladores. Una copia completa de Supervisor sí incluye esa clave; protege tus copias. Restaurar un JSON de menús/productos no cambia la conexión. Conecta únicamente chats de confianza: autorizar un grupo permite gestionar los datos compartidos a sus participantes según las reglas de los botones.
+Desactivar impide nuevas llamadas, conserva la clave y retira el anuncio; el reinicio no reactiva una desactivación explícita. Regenerar invalida la clave anterior y reanuncia: la entrada gestionada de la misma app la actualiza automáticamente; solo el modo manual requiere copiarla. La clave se guarda en `/data/ha_bridge.json`, excluido de exportaciones JSON e instaladores, pero incluido en una copia completa de Supervisor: protege tus copias. Restaurar un JSON de datos no cambia la conexión. Autorizar un grupo permite gestionar los datos compartidos a sus participantes según las reglas de los botones.
+
+En Datos y ajustes, `announced` solo indica **anuncio aceptado por Supervisor**, no prueba que Core haya terminado de enlazar. Si Core está apagado o falta el componente, hay reintentos por intervalo sin bloquear la interfaz ni rotar la clave; instala/actualiza el componente, reinicia Core y comprueba la entrada y una acción de lectura. `unavailable` no se soluciona inventando una URL: consulta [estados y diagnóstico](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md#estados-y-diagnóstico).
 
 La interfaz web y las funciones locales siguen disponibles sin Telegram. Telegram necesita Internet y recibe el contenido de los mensajes que envíes o consultes. Las pruebas locales no equivalen a verificar una instalación real en Core/Supervisor.
 
@@ -232,17 +234,19 @@ Después, comprueba el catálogo, la lista y el menú. Conserva también una cop
 ## Actualizar una instalación local
 
 1. Exporta los datos y crea una copia de seguridad de Home Assistant con esta app incluida.
-2. Sustituye los archivos de `/local_apps/menu_compra` (o `/addons/menu_compra`) por la nueva versión completa. No toques `/data`.
+2. Para pasar de 1.0.0 a 1.1.0 con integración HA, **actualiza primero el componente** en `/config/custom_components/menu_compra/` y **reinicia Core**. Después sustituye los archivos de `/local_apps/menu_compra` (o `/addons/menu_compra`) por la app 1.1.0 completa. No toques `/data` ni cambies el slug.
 3. Comprueba que `version` en `config.yaml` es superior a la instalada, busca actualizaciones en la tienda y pulsa **Actualizar**. El Supervisor reconstruye la imagen local.
 4. Revisa Registro, abre la app y verifica que tus datos siguen presentes. Recarga el navegador si conserva recursos anteriores.
 
-Para probar cambios propios, incrementa la versión y sigue ese procedimiento. No uses la desinstalación como método de actualización: puede borrar los datos.
+No recrees la integración ni la automatización, ni regeneres claves para actualizar. Para la misma app se conservan ID de entrada, entidad Telegram y chats/opciones; una entrada manual con la misma URL puede adoptarse. Si apunta a otra instalación se explica el conflicto antes de cambiarla. Se respeta `enabled: false`: pulsa Activar si quieres enlazar. La integración 1.1.0 admite backends 0.6.0/1.0.0/1.1.0 para facilitar la transición. [Actualización paso a paso](https://github.com/JLInF97/menu-compra-ha/blob/main/ENLACE_AUTOMATICO.md#actualizar-desde-100).
+
+Para probar cambios propios, incrementa la versión y sigue ese procedimiento. No uses la desinstalación como método de actualización: puede borrar los datos. Pasar de local a repositorio no es este procedimiento: requiere migración explícita de datos y elección de app.
 
 ## Seguridad y detalles del empaquetado
 
 - Imagen base multi-arquitectura **`python:3.12-slim`**, con `FROM` directo. No se necesita `build.yaml`, actualmente obsoleto.
 - Se utiliza `init: true`: esta imagen no contiene S6 ni Bashio y el Supervisor añade el init de Docker.
-- Uvicorn escucha en `0.0.0.0:8099` **dentro** del contenedor. No hay `ports`, `host_network` ni acceso a las API de Home Assistant/Supervisor.
+- Uvicorn escucha en `0.0.0.0:8099` **dentro** del contenedor. No hay `ports`, `host_network` ni permisos ampliados `hassio_api`/`homeassistant_api`. El descubrimiento solo usa las rutas de Supervisor autorizadas para la propia app; no instala archivos en `/config`.
 - Ingress llega desde **`172.30.32.2`**; el backend limita el acceso a ese origen en producción. La comprobación local de salud tiene una excepción específica para localhost.
 - `run.sh` usa `exec` y **`--no-proxy-headers`**: la comprobación debe ver la IP real de la conexión, no `X-Forwarded-For`.
 - `MENU_COMPRA_DATA_DIR=/data` en producción. **`MENU_COMPRA_DEV=1` solo en desarrollo**, con escucha local en `127.0.0.1`: desactiva la restricción de Ingress y no añade autenticación.
@@ -261,13 +265,16 @@ Para probar cambios propios, incrementa la versión y sigue ese procedimiento. N
 | La página carga sin recursos o la API falla | Recarga; los enlaces deben ser relativos a Ingress. No uses `/api/...` ni `/static/...` desde su interfaz. |
 | Una petición manual de escritura falla | Usa JSON y la cabecera `X-Menu-Compra: 1`, desde el contexto Ingress correcto. No se necesita un token de administrador de Home Assistant. |
 | Un usuario no ve el panel | Comprueba que se activó Mostrar en la barra lateral y que tiene acceso a la app; `panel_admin` está a `false`. |
-| Precio o supermercado desactualizado | Comprueba que tienes 1.0.0 y recarga la interfaz. Al editar la ficha, la lista se sincroniza; una sesión abierta en otro dispositivo puede necesitar recarga. |
+| Precio o supermercado desactualizado | Comprueba que tienes 1.1.0 y recarga la interfaz. Al editar la ficha, la lista se sincroniza; una sesión abierta en otro dispositivo puede necesitar recarga. |
+| No aparece la entrada automática | App/componente 1.1.0, reinicio de Core y conexión activada. `announced` solo confirma el anuncio a Supervisor. Revisa Dispositivos y servicios; consulta la guía de enlace, sin publicar secretos. |
+| Servidor no disponible o enlace pendiente | Arranca app/Core, instala el componente si falta y reinicia Core. Hay reintentos sin rotar claves; no abras puertos ni actives modo DEV para arreglarlo. |
+| Se descubren varias apps | Elige explícitamente la correcta; local y repositorio tienen datos separados y no se migra la entrada en silencio. |
 | Un plato no coincide con un producto | Usa Añadir a la compra: permite escoger entre coincidencias o crear el producto. No se buscan ingredientes de recetas ni se descompone el texto automáticamente. |
 | Los datos parecen haberse perdido en desarrollo | Revisa `MENU_COMPRA_DATA_DIR`: otra carpeta implica otra base de datos. En HA el directorio debe ser `/data`. |
 
 ## Comprobaciones y límites
 
-La configuración y estas instrucciones se contrastaron con las fuentes oficiales actuales enlazadas más abajo, incluidas la ruta `local_apps`, la compatibilidad del nombre antiguo, los permisos de Ingress, `init` y las copias en frío. Comprobaciones realizadas localmente:
+Las comprobaciones históricas del empaquetado y de la app anteriores a 1.1.0 se resumen a continuación; **no certifican el nuevo enlace automático**. Incluyen la ruta `local_apps`, el nombre antiguo, Ingress, `init` y las copias en frío:
 
 - Manifiesto remoto de `python:3.12-slim` consultado: incluye Linux `amd64` y `arm64` (el equivalente de `aarch64` en Docker). No implica haber construido ni arrancado la imagen.
 - YAML leído con un analizador y aserciones de identidad, arquitecturas, Ingress, `init: true`, copias en frío y ausencia de puertos/permisos adicionales.
@@ -275,7 +282,9 @@ La configuración y estas instrucciones se contrastaron con las fuentes oficiale
 - FastAPI `0.162.5` y Uvicorn `0.54.0` consultados en PyPI. Resolución de dependencias solo con paquetes binarios para Python **3.11 y 3.12**, tanto Linux **amd64** como **aarch64**, sin conflictos. Esto no es ejecutar los paquetes en esos cuatro destinos.
 - Arranque HTTP real con Python **3.11.16**, dependencias fijadas y SQLite temporal: salud 200, acceso directo 403 en modo producción y cabecera `X-Forwarded-For` incapaz de eludir la restricción. En modo desarrollo, lectura del catálogo y exportación JSON versionada correctas. No se utilizaron datos reales ni un servidor de Home Assistant.
 
-**El usuario confirma que ha realizado las pruebas solicitadas en un Home Assistant de test y todo funciona. No ha probado aarch64.** Es una confirmación manual suya; el agente no ha ejecutado esa instalación ni usado sus credenciales. Las pruebas HTTP locales y el workflow de CI tienen un alcance distinto y se documentan por separado.
+**La confirmación del usuario en un Home Assistant de test corresponde a 1.0.0, no a 1.1.0; no incluyó hardware aarch64.** El agente no ejecutó esa instalación ni usó sus credenciales. Los documentos raíz [VERIFICACION.md](https://github.com/JLInF97/menu-compra-ha/blob/main/VERIFICACION.md), [PREPUBLICACION.md](https://github.com/JLInF97/menu-compra-ha/blob/main/PREPUBLICACION.md) y [CIERRE-1.0.0.md](https://github.com/JLInF97/menu-compra-ha/blob/main/CIERRE-1.0.0.md) conservan ese contexto histórico.
+
+Para 1.1.0 deberán ejecutarse CI y pruebas de los ZIP extraídos con resultados propios; esta guía no afirma que ya hayan pasado. Las fixtures Supervisor/Core, los helpers y esquemas aislados no son una prueba en un runtime real de Home Assistant. El enlace con Core/Supervisor real y la entrega al bot real siguen pendientes de validación.
 
 Al desplegar en otro dispositivo o arquitectura conviene repetir detección en la tienda, construcción/arranque, Ingress, persistencia tras reinicio/actualización y recuperación de copias. La comprobación aarch64 sigue pendiente. La automatización Docker arm64 bajo QEMU, una vez ejecutada, no sustituirá una prueba completa en HA sobre hardware aarch64.
 

@@ -28,6 +28,7 @@ dist/
 .env
 .env.*
 ha_bridge.json
+ha_discovery.json
 !.env.example
 
 # Archivos privados y de diseño/desarrollo que no se publican

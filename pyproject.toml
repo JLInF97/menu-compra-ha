@@ -3,6 +3,11 @@ pythonpath = ["menu_compra"]
 testpaths = ["tests"]
 addopts = "-ra"
 
+[tool.pyright]
+# Raíz del proyecto y paquete de la app; sin rutas del equipo de desarrollo.
+extraPaths = [".", "menu_compra", "tests"]
+pythonVersion = "3.12"
+
 [tool.ruff]
 line-length = 140
 

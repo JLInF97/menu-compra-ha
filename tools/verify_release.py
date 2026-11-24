@@ -9,7 +9,7 @@ import sys
 import tempfile
 import zipfile
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 SMOKE = r'''
@@ -22,7 +22,7 @@ from app.main import create_app
 import app.main
 assert Path(app.main.__file__).resolve().is_relative_to(Path(sys.argv[1]).resolve())
 with TestClient(create_app(sys.argv[2], development=True), headers={"X-Menu-Compra": "1"}) as client:
-    assert client.get("/api/health").json() == {"status": "ok", "version": "1.0.0"}
+    assert client.get("/api/health").json() == {"status": "ok", "version": "1.1.0"}
     assert client.get("/").status_code == 200
     assert "menu/batch" in client.get("/static/app.js").text
     categories = client.get("/api/categories").json()
@@ -57,7 +57,7 @@ with TestClient(create_app(sys.argv[2], development=True), headers={"X-Menu-Comp
     assert len(client.get("/api/menu?week=2026-11-19").json()["entries"]) == 2
     assert client.post("/api/menu/duplicate-week", json={"week": "2026-11-12"}).json()["copied"] == 0
     shopping = client.get("/api/shopping").json()
-    assert client.get("/api/bootstrap").json()["version"] == "1.0.0"
+    assert client.get("/api/bootstrap").json()["version"] == "1.1.0"
     assert client.post(f"/api/products/{product_id}/price", json={"price_cents": 600}).status_code == 200
     line = next(i for g in client.get("/api/shopping").json()["groups"] for i in g["items"] if i["product_id"] == product_id)
     assert line["unit_price_cents"] == 600
@@ -87,7 +87,7 @@ with TestClient(create_app(sys.argv[2], development=True), headers={"X-Menu-Comp
     key = client.post('/api/ha/token', json={}).json()['token']
     auth = {'Authorization': 'Bearer ' + key}
     assert client.get('/bridge/v1/health').status_code == 401
-    assert client.get('/bridge/v1/health', headers=auth).json()['version'] == '1.0.0'
+    assert client.get('/bridge/v1/health', headers=auth).json()['version'] == '1.1.0'
     assert client.get('/bridge/v1/backup', headers=auth).status_code == 404
     assert client.post('/bridge/v1/shopping/quick-add', headers=auth, json={'name': 'Alta desde HA'}).status_code == 201
     assert client.get('/api/shopping').json()['count'] == 1
@@ -123,7 +123,7 @@ def main():
             for name in archive.namelist():
                 if name.startswith('custom_components/') or name.startswith('blueprints/'):
                     assert (scratch / 'sources' / 'menu-compra-ha' / name).read_bytes() == (scratch / 'ha' / name).read_bytes()
-        print(json.dumps({'zip': str(integration), 'crc': 'ok', 'manifest': '1.0.0', 'matches_source': True,
+        print(json.dumps({'zip': str(integration), 'crc': 'ok', 'manifest': '1.1.0', 'matches_source': True,
                           'sha256': sha256(integration.read_bytes()).hexdigest()}), flush=True)
         subprocess.run([sys.executable, "-c", SMOKE, str(scratch / "installer" / "menu_compra"), str(scratch / "probe-data")], check=True)
         subprocess.run([sys.executable, "-m", "pytest", "-q", '--junitxml', str((args.evidence_dir / 'pytest-extracted.xml').resolve())],
@@ -140,6 +140,10 @@ def main():
                             "--app-dir", str(scratch / "installer" / "menu_compra"),
                             "--script", str(ROOT / "tests" / "browser_icon_v1.js"),
                             "--output", str((args.evidence_dir / "branding").resolve())], check=True)
+            subprocess.run([sys.executable, str(ROOT / "tools" / "verify_ui_v5_1.py"),
+                            "--app-dir", str(scratch / "installer" / "menu_compra"),
+                            "--script", str(ROOT / "tests" / "browser_auto_setup.js"), '--supervisor-fixture',
+                            "--output", str((args.evidence_dir / "enlace-automatico").resolve())], check=True)
     print("ZIP de app, integración HA y fuentes extraídos: verificados. No es una prueba de Docker/Supervisor/HA real.", flush=True)
 
 

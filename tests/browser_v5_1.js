@@ -20,7 +20,7 @@ const record = name => results.cases.push({ name, status: 'passed' });
       return response.json();
     }
     let bootstrap = await json('GET', 'bootstrap');
-    assert.equal(bootstrap.version, '1.0.0');
+    assert.equal(bootstrap.version, '1.1.0');
     const category = bootstrap.categories.find(c => c.is_system);
     const store = bootstrap.supermarkets.find(s => s.is_system);
     const notes = 'Nota histórica conservada\nSegunda línea';

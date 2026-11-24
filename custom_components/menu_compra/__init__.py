@@ -1,4 +1,4 @@
-"""Menú y Compra 0.6.0: acciones locales sin entidades ni polling."""
+"""Menú y Compra 1.1.0: acciones locales sin entidades ni polling."""
 from __future__ import annotations
 from dataclasses import dataclass
 

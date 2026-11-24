@@ -1,29 +1,31 @@
-# Menú y Compra 1.0.0 · Home Assistant y Telegram
+# Menú y Compra 1.1.0 · Home Assistant y Telegram
 
-## Actualizar desde app 0.6.0 e integración 0.6.0/0.6.1
+## Actualizar desde 1.0.0 sin perder datos
 
-Haz copia de seguridad. Primero sustituye `/config/custom_components/menu_compra/` con el ZIP `menu-compra-ha-1.0.0-integracion.zip` y reinicia Core. Esta integración admite app0.6.0 y app1.0.0, por lo que después puedes sustituir los archivos de la app y actualizarla a1.0.0 con su ZIP instalador. No desinstales, no borres /data, no cambies su clave ni recrees integración o automatización. El blueprint no ha cambiado. La versión estable consolida el comportamiento aprobado y añade el icono elegido; futuras funciones serán evolutivos.
+Haz copia JSON y una copia de Home Assistant que incluya la app. Primero sustituye `/config/custom_components/menu_compra/` con el componente **1.1.0** y reinicia Core; después actualiza la misma app a **1.1.0**. No desinstales, no borres `/data`, no cambies el slug ni su clave y no recrees la integración o automatización. La integración admite backends 0.6.0/1.0.0/1.1.0 durante la transición. Para la misma app se conservan ID de entrada, datos, entidad Telegram y chats/opciones. Una entrada manual con la misma URL puede adoptarse; una distinta requiere resolver la elección, no se sustituye silenciosamente.
+
+Si la conexión estaba desactivada (`enabled: false`), seguirá desactivada tras actualizar o reiniciar. Para usarla pulsa **Activar** en Datos y ajustes, sin introducir URL ni clave. La nueva activación por defecto solo corresponde a una app nueva bajo Supervisor. [Guía del enlace automático y sus límites](ENLACE_AUTOMATICO.md).
 
 `/menu` muestra por defecto la semana actual completa de lunes a domingo. Cada día tiene encabezado, fecha **DD/MM/YY**, guiones y Comida/Cena; se muestran también los huecos vacíos. Usa los botones Semana anterior / Semana siguiente / Semana actual. La lectura no se pagina por platos; si supera el límite de Telegram se divide en varios mensajes sin omitirlos. **Gestionar platos** abre aparte las acciones de editar/quitar, manteniendo la vista semanal limpia.
 
 Integración local para **Home Assistant Core 2026.11.1**. Reutiliza la integración **Telegram Bot que ya tienes**; no crea otro bot, no añade polling de Telegram ni necesita su token. La aplicación sigue funcionando por Ingress aunque desactives esta conexión.
 
-## 1. Instalar o actualizar la aplicación
+## 1. Instalar la app 1.1.0
 
-**Origen de la instalación y URL del bridge:** desde `https://github.com/JLInF97/menu-compra-ha`, usa `http://1872afc9-menu-compra:8099`. `http://local-menu-compra:8099` es solo para la instalación local manual (la app conserva esa sugerencia). El prefijo se deriva de la URL exacta del repositorio; ramas u otras variantes pueden cambiarlo. Comprueba el identificador de tu app en el Supervisor si es diferente.
+Instala desde el [repositorio público](https://github.com/JLInF97/menu-compra-ha) o usa `menu-compra-ha-1.1.0-instalar.zip` para una app local. Consulta la disponibilidad de los paquetes en [Releases](https://github.com/JLInF97/menu-compra-ha/releases). **El flujo normal no pide ninguna URL ni clave:** la app obtiene su identidad real de Supervisor, sin host fijo ni hash de repositorio calculado a mano.
 
-No cambies de instalación local a repositorio como si fuera una actualización: son apps distintas con datos separados. Para migrar, exporta/restaura JSON y configura en la integración la URL y la clave de la nueva app; no se transfieren las credenciales con el JSON.
+No cambies de instalación local a repositorio como si fuera una actualización: son apps distintas con identificadores, datos y claves separados. Exporta/restaura JSON y elige explícitamente qué app enlazar; no se transfieren las credenciales con el JSON ni se migra automáticamente una entrada que apunta a otra instalación.
 
 1. Exporta una copia JSON de los datos y conserva también una copia de seguridad de Home Assistant que incluya la aplicación.
-2. Instala/actualiza la aplicación local con el **instalador de la app 1.0.0**, no con el ZIP de integración HA. Conserva el slug `menu_compra` y sus datos; no desinstales para actualizar. Las instalaciones recientes usan `/local_apps/menu_compra` (recurso Samba `local_apps`); las antiguas pueden usar `/addons/menu_compra` (`addons`). No instales ambas copias.
-3. Actualiza la tienda de aplicaciones locales, instala/actualiza y arranca. Comprueba versión 1.0.0 y que menú, compra y catálogo siguen presentes desde Ingress.
-4. Abre **Datos y ajustes → Conectar con Home Assistant**. Activa la conexión y pulsa **Mostrar clave** solo cuando vayas a copiarla. La URL interna sugerida es `http://local-menu-compra:8099`.
+2. Instala la app **1.1.0**, no el ZIP de integración HA. Si actualizas, sigue antes el orden componente → reinicio Core → app indicado arriba. Conserva el slug `menu_compra` y sus datos; no desinstales. Las instalaciones locales recientes usan `/local_apps/menu_compra` (Samba `local_apps`); las antiguas pueden usar `/addons/menu_compra` (`addons`). No instales ambas copias.
+3. Refresca la tienda, instala/actualiza y arranca. Comprueba versión 1.1.0 y que menú, compra y catálogo siguen presentes desde Ingress.
+4. En **Datos y ajustes → Conectar con Home Assistant**, consulta el estado de enlace automático. En una app nueva bajo Supervisor se activa y genera la clave al iniciar. Si ya había una configuración, se conserva, incluida la desactivación; pulsa **Activar** solo si quieres habilitarla. No necesitas mostrar ni copiar la clave.
 
-No publiques el puerto 8099, no actives `host_network` y no uses la URL larga de Ingress en la integración. No hacen falta permisos de Supervisor API ni de Core API. La clave bridge es diferente de todas las claves HA y del token Telegram.
+No publiques el puerto 8099, no actives `host_network` y no uses la URL larga de Ingress en la integración. No hacen falta permisos ampliados `hassio_api`/`homeassistant_api`: Supervisor autoriza las rutas de identidad y descubrimiento de la propia app. La clave bridge es diferente de las claves HA y del token Telegram; viaja por el canal autenticado Supervisor/Core, no por formularios del flujo normal.
 
 ## 2. Copiar el ZIP HA y reiniciar
 
-El **ZIP de integración HA**, separado del instalador de la app, contiene `custom_components/`, `blueprints/` y esta guía. Copia su contenido dentro de `/config` de Home Assistant, fusionando carpetas:
+El **ZIP `menu-compra-ha-1.1.0-integracion.zip`**, separado del instalador de la app, contiene `custom_components/`, `blueprints/` y esta guía. Copia las dos carpetas dentro de `/config` de Home Assistant, fusionándolas con las existentes:
 
 ```text
 /config/custom_components/menu_compra/__init__.py
@@ -40,18 +42,24 @@ El **ZIP de integración HA**, separado del instalador de la app, contiene `cust
 /config/blueprints/automation/menu_compra/telegram.yaml
 ```
 
-Evita una carpeta extra como `/config/menu-compra-ha-1.0.0/custom_components`. Reinicia **Home Assistant**, no solo la aplicación. Es una integración personalizada, no HACS ni una integración oficial del catálogo.
+Evita una carpeta extra como `/config/menu-compra-ha-1.1.0/custom_components`. Reinicia **Home Assistant Core**, no solo la aplicación. Esta instalación manual del componente es necesaria una vez (y hay que reemplazar sus archivos cuando se actualice); la app no tiene montaje de escritura en `/config` ni puede instalarlo sola. Es una integración personalizada, no HACS ni una integración oficial del catálogo.
 
-## 3. Añadir la integración
+## 3. Comprobar la entrada automática y configurar Telegram
 
-En **Ajustes → Dispositivos y servicios → Añadir integración**, busca **Menú y Compra**:
+Después del reinicio, con la app activa, ve a **Ajustes → Dispositivos y servicios** y comprueba la entrada **Menú y Compra**. Con una sola app descubierta, la entrada se crea automáticamente sin campos de URL/contraseña; si abres **Añadir integración → Menú y Compra**, también se consultan los descubrimientos. Con varias apps debes elegir la instalación; no se selecciona una arbitrariamente ni se cambia una entrada a otra app sin decisión explícita.
 
-- **URL interna**: `http://local-menu-compra:8099` en HA OS con la aplicación local. En una instalación diferente usa el origen HTTP/HTTPS accesible desde HA, con su puerto; sin ruta, parámetros, credenciales ni fragmentos.
-- **Clave bridge**: pega la clave completa de Datos y ajustes. El campo es de contraseña y se valida contra `/bridge/v1/health`.
+Abre **Configurar/Opciones** de la entrada para autorizar Telegram explícitamente:
+
 - **Entidad de eventos Telegram**: opcional. Selecciona `event.…` de tu integración Telegram Bot existente, no una entidad notify.
 - **Chats permitidos**: IDs numéricos separados por comas. **Vacío desactiva Telegram**, aunque hayas seleccionado una entidad. Por ejemplo, `123456789, -1001234567890` son IDs de ejemplo, no valores que debas copiar.
 
-Solo se admite **una entrada** Menú y Compra; las acciones exigen además `config_entry_id` explícito. No hay sensores ni sincronización periódica: las consultas leen el backend al pedirlas. La entrada ofrece **Configurar/Opciones** y **Reconfigurar** para URL, clave, entidad y chats. En opciones/reconfiguración, deja la contraseña vacía para conservarla; nunca se precarga en el formulario. Para apagar Telegram, vacía los chats (y, opcionalmente, elimina la entidad).
+Solo se admite **una entrada** Menú y Compra; las acciones exigen además `config_entry_id` explícito. El descubrimiento no autoriza grupos ni chats y conserva las opciones Telegram existentes. Para apagar Telegram, vacía los chats (y, opcionalmente, elimina la entidad). No hay sensores ni sondeo periódico de los datos: las consultas leen el backend al pedirlas. La actualización automática de host/credenciales de la misma app conserva el ID; **Reconfigurar/reauth** de una entrada gestionada obtiene la clave de Supervisor sin pedirte que la escribas.
+
+El estado `announced` en la app significa solo **anuncio aceptado por Supervisor**, no confirma que Core haya creado/cargado la entrada. Si Core está apagado o falta el componente, hay reintentos por intervalo, sin bloquear Ingress ni rotar la clave. Instala/actualiza el componente, reinicia Core y comprueba la entrada; no intentes solucionarlo pegando una URL fija.
+
+### Configuración manual avanzada (no necesaria en HA OS)
+
+Solo para Docker sin Supervisor, desarrollo o migraciones especiales: abre **Configuración manual avanzada**. Usa el origen HTTP/HTTPS real accesible desde Core, sin ruta, parámetros, credenciales ni fragmentos, y la clave bridge de esa instalación. No uses una URL de Ingress ni copies un hostname de otra app. Los detalles de identidad y transporte están en [la guía avanzada](ENLACE_AUTOMATICO.md#arquitectura-y-configuración-manual-avanzada). En el modo manual, una contraseña vacía en opciones conserva la clave anterior; no se precarga ni debe aparecer en capturas.
 
 ### Chats y grupos
 
@@ -147,16 +155,16 @@ No hay proxy HTTP arbitrario, backup/restore por bridge, cambios de categorías/
 
 ## 7. Rotar, desactivar y hacer copias
 
-- **Rotar**: Datos y ajustes → Regenerar clave → confirmar. Invalida la anterior inmediatamente. Copia la nueva y actualízala en Opciones/Reconfigurar de la integración. No compartas la clave por Telegram ni la incluyas en capturas.
-- **Desactivar bridge**: corta las siguientes llamadas de máquina; Ingress y la UI siguen disponibles. Para volver, activa y valida la integración.
+- **Rotar**: Datos y ajustes → Regenerar clave → confirmar. Invalida la anterior inmediatamente. Bajo Supervisor se vuelve a anunciar y la entrada gestionada de la misma app actualiza su credencial automáticamente; comprueba su disponibilidad antes de ejecutar acciones. Solo una conexión manual avanzada exige actualizar la clave manualmente. No compartas la clave por Telegram ni la incluyas en capturas.
+- **Desactivar bridge**: corta las siguientes llamadas de máquina y retira el anuncio; Ingress y la UI siguen disponibles. Se conserva la clave y la desactivación se respeta tras reiniciar/actualizar. Para volver, pulsa **Activar**; se reanuncia sin pedir campos de conexión.
 - **Solo apagar Telegram**: vacía chats permitidos y/o desactiva su automatización. Las acciones HA de compra/menú siguen disponibles.
 - La app guarda su clave en `/data/ha_bridge.json`, separada de la exportación JSON de datos. La exportación JSON no contiene esa clave ni sustituye la copia de seguridad HA.
 - La copia de seguridad de la app debe incluir `/data`; la de HA incluye la configuración de la integración y su clave. **Trata ambas como secretos** y protege también las copias antiguas. Restaurar una copia antigua puede restaurar una clave anterior; rota después si procede.
-- La URL HTTP sugerida es para la red interna de HA OS. No expongas el bridge a Internet ni uses HTTP sin protección en una red no confiable. El cliente valida HTTPS normalmente y no sigue redirects que puedan filtrar Bearer.
+- El origen interno descubierto es para la red de HA OS, no una URL pública. No expongas el bridge a Internet ni uses HTTP sin protección en una red no confiable. El cliente valida HTTPS normalmente y no sigue redirects que puedan filtrar Bearer.
 
 ## 8. Prueba manual en tu HA (pendiente de ejecutar allí)
 
-1. Comprueba que la conexión se añade y que `get_shopping` devuelve la lista correcta sin Telegram.
+1. Con app/componente 1.1.0 y Core reiniciado, comprueba que aparece la entrada sin escribir URL ni clave y que `get_shopping` devuelve la lista correcta sin Telegram. Si partes de 1.0.0, verifica ID de entrada, datos y opciones/chats conservados. Una conexión antes desactivada debe seguir desactivada hasta pulsar Activar.
 2. En un chat permitido envía `/menuc`, `/compra` y `/menu semana`; comprueba el mismo bot/chat/tema de salida.
 3. Envía `/comprar 2 Producto de prueba`. Comprueba en Ingress una sola línea con cantidad 2. Prueba marcar, desmarcar y +1/−1.
 4. Si tienes el mismo nombre en dos supermercados, busca ese nombre y comprueba que se pregunta cuál antes de escribir.
@@ -168,15 +176,17 @@ No hay proxy HTTP arbitrario, backup/restore por bridge, cambios de categorías/
 ## 9. Diagnóstico y alcance de las verificaciones
 
 - **No aparece la integración:** revisa ruta de `manifest.json`, reinicia HA y comprueba los logs. No hace falta reinstalar Supervisor.
-- **No conecta:** usa origen interno, verifica app 1.0.0 arrancada, bridge activado y clave actual. Una URL Ingress o un redirect se rechazan deliberadamente.
+- **No aparece la entrada automática:** comprueba app y componente 1.1.0, reinicio de Core y conexión activada. `pending`/`error` indican espera o fallo del anuncio; `unavailable` indica que no está disponible el canal Supervisor. Los reintentos no cambian claves ni bloquean la UI. `announced` no prueba que Core haya enlazado: revisa también Dispositivos y servicios y los registros sin publicar secretos.
+- **Servidor no disponible:** arranca Core y la app; si falta el componente, cópialo y reinicia Core. Espera al siguiente reintento o abre Añadir integración para consultar los descubrimientos. No publiques puertos ni regeneres claves como solución a un fallo de red. En modo manual avanzado, una URL Ingress o un redirect se rechazan deliberadamente.
+- **Varias instalaciones o conflicto:** elige la app correcta y comprueba sus datos desde Ingress. Una instalación local y otra del repositorio no comparten `/data`; no se sustituye silenciosamente la entrada de una por otra.
 - **Telegram no responde:** verifica chats en ambas integraciones, entidad event correcta, automatización activada y traza. Tras `unknown`, repite un comando. No sustituyas el blueprint por eventos legacy del bus.
 - **Botón caducado:** es normal tras 10 minutos, uso previo, limpieza del caché o recarga. Abre `/menuc`/`/compra`/`/menu` de nuevo.
 - **Timeout/error después de escribir:** no repitas a ciegas; consulta los datos. No hay reintento de escrituras ni reenvío de entrega Telegram.
 
-Verificación local: módulos puros contra **servidor FastAPI/SQLite real**, cliente **aiohttp 3.14.5**, pruebas de restauración JSON real, rotación y autenticación reales. La salida Telegram de esas pruebas es una **fixture explícita que captura payloads**, no un bot real. Las fixtures TCP adversarias comprueban redirects y pérdida de respuesta sin simular la API de la app. Se validan JSON/YAML, AST, plantillas Jinja con estados fixture y schemas con **probatio 0.13.0 real** y helpers `cv` fixture declarados.
+Las verificaciones históricas de 1.0.0 incluyen módulos puros contra **servidor FastAPI/SQLite real**, cliente **aiohttp 3.14.5**, restauración JSON, rotación y autenticación. La salida Telegram usa una **fixture explícita que captura payloads**, no un bot real. Las fixtures TCP adversarias comprueban redirects y pérdida de respuesta. JSON/YAML, AST, plantillas Jinja con estados fixture y schemas con **probatio 0.13.0** y helpers `cv` fixture no equivalen a ejecutar Core. Ninguno de esos resultados históricos certifica el descubrimiento 1.1.0.
 
 Interfaces contrastadas con fuentes oficiales del tag **2026.11.1**: [Telegram event.py](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/components/telegram_bot/event.py), [bot.py](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/components/telegram_bot/bot.py), [services.py](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/components/telegram_bot/services.py), [services.yaml](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/components/telegram_bot/services.yaml), [config_flow.py](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/components/telegram_bot/config_flow.py), [config_entries.py](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/homeassistant/config_entries.py) y [requirements.txt](https://raw.githubusercontent.com/home-assistant/core/2026.11.1/requirements.txt). Se usa **probatio**, no voluptuous; Core requiere Python ≥3.14.2. Los módulos puros siguen siendo importables en Python 3.11 para desarrollo.
 
-Los resultados consolidados de la entrega original están en `VERIFICACION.md`. La preparación de CI se documenta en `PRUEBAS.md` y genera sus propios informes bajo build/; las evidencias históricas locales no se incluyen en los nuevos paquetes de fuentes. Incluyen las pruebas HA/Telegram, las regresiones de la app y la confirmación de callbacks sin repetir escrituras si caduca el aviso Telegram. Ruff y los tests de navegador se ejecutan también sobre el paquete final. Existe un aviso de deprecación de Starlette sobre `httpx`, no un fallo. En Python 3.11 se omiten las pruebas de probatio cuando ese paquete no es compatible; la verificación completa se hace con Python 3.14.9.
+Los resultados históricos están en [VERIFICACION.md](https://github.com/JLInF97/menu-compra-ha/blob/main/VERIFICACION.md). [PRUEBAS.md](https://github.com/JLInF97/menu-compra-ha/blob/main/PRUEBAS.md) describe el procedimiento reproducible y los informes bajo `build/`; su base estable histórica no es un recuento nuevo de 1.1.0. La nueva versión deberá ejecutar sus pruebas, CI y verificación de ZIP extraídos antes de publicarse. Las fixtures Supervisor/Core y los esquemas aislados no son una instalación de Home Assistant real. Esta guía no afirma que 1.1.0 ya haya superado CI o una prueba real de Core/Supervisor/Telegram.
 
-**Confirmación manual posterior:** el usuario informa de que ha realizado las pruebas solicitadas en un Home Assistant de test y todo funciona, sin probar aarch64. Esto actualiza el estado de validación manual, no implica que el agente haya instalado archivos, usado credenciales ni ejecutado HA/Telegram real. Los resultados locales del agente, los futuros jobs de CI y la prueba del usuario se mantienen separados.
+**Confirmación manual histórica (1.0.0):** el usuario informó de funcionamiento en un Home Assistant de test, sin probar hardware aarch64. No se traslada esa confirmación al enlace automático 1.1.0. Sigue pendiente comprobarlo en Core/Supervisor real y con el bot real, además de hardware aarch64. Código bajo [licencia MIT](LICENSE).

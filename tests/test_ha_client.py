@@ -15,7 +15,7 @@ settings = pure_module("settings")
 @pytest.mark.anyio
 async def test_client_real_shopping_menu_and_catalogue():
     async with real_backend() as b:
-        assert (await b.client.health())["version"] == "1.0.0"
+        assert (await b.client.health())["version"] == "1.1.0"
         product = await create_product(b)
         assert (await b.client.products("Lech"))["matches"][0]["id"] == product["id"]
         assert (await b.client.product(product["id"]))["name"] == "Leche"

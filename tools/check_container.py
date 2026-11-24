@@ -34,7 +34,7 @@ def request(path, headers=None):
 status, body = request("/api/health")
 assert status == 200, (status, body)
 health = json.loads(body)
-assert health == {"status": "ok", "version": "1.0.0"}, health
+assert health == {"status": "ok", "version": "1.1.0"}, health
 spoofs = [
     {},
     {"X-Forwarded-For": "172.30.32.2"},

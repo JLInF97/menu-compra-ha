@@ -19,8 +19,9 @@ from .backup import export_data, restore_data
 from .db import Database, now, sync_shopping_products, ensure_system_metadata
 from .ha_bridge import BridgeState, BridgeConfig, bridge_target, BODY_LIMIT
 from .models import CategoryIn, SupermarketIn, ProductIn, PriceIn, ShoppingIn, ShoppingPatch, DishIn, MenuIn, IngredientSelection, MenuBatchIn, MenuShoppingIn, QuickShoppingIn, DuplicateWeekIn, ShoppingAdjustIn
+from .supervisor_discovery import SupervisorDiscovery, SupervisorTransport, INTERVAL, local_http_ready
 
-VERSION = "1.0.0"
+VERSION = "1.1.0"
 STATIC = Path(__file__).parent / "static"
 PRODUCT_SELECT = """SELECT p.*,c.name AS category_name,c.is_frozen,s.name AS supermarket_name
  FROM products p JOIN categories c ON p.category_id=c.id
@@ -234,7 +235,7 @@ def duplicate_menu_week(connection, week):
     return {"source_week": source.isoformat(), "target_week": target.isoformat(), "copied": len(entries), "skipped": skipped, "entries": entries}
 
 
-def create_app(data_dir=None, development=None):
+def create_app(data_dir=None, development=None, *, supervisor_transport=..., discovery_interval=INTERVAL):
     development = (os.getenv("MENU_COMPRA_DEV", "0") == "1") if development is None else development
     database = Database(data_dir or os.getenv("MENU_COMPRA_DATA_DIR", "/data"))
     bridge = BridgeState(database.path.parent)
@@ -242,8 +243,16 @@ def create_app(data_dir=None, development=None):
     @asynccontextmanager
     async def lifespan(application):
         database.initialize()
-        bridge.load()
-        yield
+        transport = SupervisorTransport.from_environment() if supervisor_transport is ... else supervisor_transport
+        bridge.load(automatic=transport is not None)
+        discovery = SupervisorDiscovery(bridge, transport, interval=discovery_interval,
+                                       ready_check=local_http_ready if supervisor_transport is ... and transport is not None else None)
+        application.state.supervisor_discovery = discovery
+        discovery.start()
+        try:
+            yield
+        finally:
+            await discovery.close()
 
     application = FastAPI(title="Menú y Compra", version=VERSION, lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
     application.state.database = database

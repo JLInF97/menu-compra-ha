@@ -1,1 +1,1 @@
-"""Menú y Compra, versión 1.0.0."""
+"""Menú y Compra, versión 1.1.0."""

@@ -58,15 +58,16 @@ def test_brand_and_favicon_load_through_relative_urls(tmp_path):
         assert len(parser.images) == 1
         for resource in parser.icons + parser.images:
             url = resource.get('href', resource.get('src'))
-            assert url.startswith('static/') and '?v=1.0.0' in url
+            assert url.startswith('static/') and '?v=1.1.0' in url
             response = client.get('/' + url)
             assert response.status_code == 200 and response.headers['content-type'].startswith('image/')
-        assert client.get('/api/health').json()['version'] == '1.0.0'
+        assert client.get('/api/health').json()['version'] == '1.1.0'
 
 
 def test_stable_metadata_preserves_access_slug_and_storage():
     config = yaml.safe_load((ROOT/'menu_compra/config.yaml').read_text(encoding='utf-8'))
-    assert config['stage'] == 'stable' and config['version'] == '1.0.0'
+    assert config['stage'] == 'stable' and config['version'] == '1.1.0'
     assert config['slug'] == 'menu_compra' and config['ingress_port'] == 8099 and config['ingress'] is True
+    assert config['discovery'] == ['menu_compra']
     assert config['backup'] == 'cold' and config['environment']['MENU_COMPRA_DATA_DIR'] == '/data'
     assert not any(key in config for key in ('ports','host_network','homeassistant_api','hassio_api'))

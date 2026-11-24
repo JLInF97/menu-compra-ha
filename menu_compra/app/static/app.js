@@ -487,7 +487,7 @@
     $('#page-description').textContent = meta[2];
     $('#page-description').hidden = state.view !== 'products';
     $('.app-footer').hidden = state.view === 'shopping';
-    $('#app-version').textContent = `v${state.bootstrap.version || '1.0.0'}`;
+    $('#app-version').textContent = `v${state.bootstrap.version || '1.1.0'}`;
     document.body.dataset.view = state.view;
     $('#shopping-fab').hidden = state.view !== 'shopping' || !state.ready || state.loading || Boolean(state.fatal);
     document.querySelectorAll('.main-nav [data-view]').forEach((node) => {
@@ -1151,7 +1151,8 @@
   function haConnectionSection(settings) {
     const section = h('section', { className: 'settings-section ha-connection', 'aria-labelledby': 'ha-connection-title' },
       h('h3', { id: 'ha-connection-title' }, 'Conectar con Home Assistant'),
-      h('p', {}, 'Permite que la integración de Menú y Compra acceda al menú y a la compra. Está desactivado inicialmente. Usa una clave propia, no la de Home Assistant ni la de Telegram.')
+      h('p', {}, 'En Home Assistant con Supervisor, el enlace se anuncia automáticamente, sin escribir una URL ni copiar una clave.'),
+      h('p', {}, 'Instala o actualiza una vez el componente personalizado Menú y Compra a la versión 1.1.0 y reinicia Home Assistant Core. Después, revisa la integración en Ajustes → Dispositivos y servicios de Home Assistant.')
     );
     const status = h('p', { role: 'status', 'aria-live': 'polite' }, 'Consultando conexión…');
     const errorBox = h('div', { className: 'alert', role: 'alert', hidden: true, tabindex: '-1' });
@@ -1160,6 +1161,8 @@
     const keyField = field('Clave de conexión', key, 'Se mantiene oculta y solo se carga cuando pulsas «Mostrar clave». No se guarda en este navegador.');
     keyField.hidden = true;
     const feedback = h('p', { className: 'hint', role: 'status', 'aria-live': 'polite' });
+    const manual = h('details', {}, h('summary', {}, 'Configuración manual avanzada'));
+    const discoveryStates = new Set(['unavailable', 'pending', 'announced', 'error', 'disabled']);
     let connection = null;
     let busy = false;
     let generation = 0;
@@ -1174,7 +1177,18 @@
     }
     function draw() {
       const enabled = connection?.enabled === true;
-      status.textContent = busy ? 'Consultando conexión…' : connection ? enabled ? 'Conexión activada.' : 'Conexión desactivada. Las llamadas de la integración están bloqueadas.' : 'No se ha podido consultar la conexión.';
+      const discoveryText = {
+        unavailable: 'Enlace automático no disponible fuera de Supervisor. La configuración manual avanzada es opcional.',
+        pending: 'Enlace automático pendiente de anuncio. Se volverá a intentar automáticamente; puedes actualizar el estado.',
+        announced: 'Anuncio automático aceptado por Supervisor. Esto no confirma que Home Assistant Core haya terminado de configurar la integración.',
+        error: 'No se ha podido anunciar el enlace automático. Se volverá a intentar; comprueba Supervisor y actualiza el estado.',
+        disabled: 'Anuncio automático desactivado.'
+      };
+      status.textContent = busy ? 'Consultando conexión…' : connection
+        ? `${enabled ? 'Conexión activada.' : 'Conexión desactivada. Las llamadas de la integración están bloqueadas.'} ${discoveryText[connection.discovery_state]}`
+        : 'No se ha podido consultar la conexión.';
+      section.dataset.discoveryState = connection?.discovery_state || '';
+      section.dataset.automatic = String(connection?.automatic === true);
       toggle.textContent = enabled ? 'Desactivar conexión' : 'Activar conexión';
       toggle.className = `btn ${enabled ? 'btn-danger' : 'btn-primary'}`;
       toggle.disabled = busy || !connection;
@@ -1188,7 +1202,7 @@
       section.setAttribute('aria-busy', String(busy));
     }
     function acceptStatus(result) {
-      if (typeof result?.enabled !== 'boolean' || typeof result.has_token !== 'boolean' || typeof result.base_url !== 'string' || result.protocol_version !== 1) {
+      if (typeof result?.enabled !== 'boolean' || typeof result.has_token !== 'boolean' || typeof result.base_url !== 'string' || result.protocol_version !== 1 || typeof result.automatic !== 'boolean' || !discoveryStates.has(result.discovery_state)) {
         throw new Error('invalid-status');
       }
       connection = result;
@@ -1244,14 +1258,14 @@
       if (key.value) { clearKey(); return; }
       const request = generation;
       const result = await api('ha/token', { method: 'POST', body: {} });
-      if (!active() || request !== generation || !connection?.enabled) return;
+      if (!active() || !manual.open || request !== generation || !connection?.enabled) return;
       if (typeof result?.token !== 'string' || !result.token) throw new Error('invalid-token');
       key.value = result.token;
       keyField.hidden = false;
     }, 'No se ha podido cargar la clave. Actualiza el estado y vuelve a intentarlo.'));
     // The copy event also supports Ctrl+C / long-press without a plaintext field.
     function copyKeyEvent(event) {
-      if (!active() || !connection?.enabled || !key.value || !event.clipboardData) return;
+      if (!active() || !manual.open || !connection?.enabled || !key.value || !event.clipboardData) return;
       event.clipboardData.setData('text/plain', key.value);
       event.preventDefault();
       copiedByEvent = true;
@@ -1263,10 +1277,10 @@
       try {
         if (!navigator.clipboard?.writeText) throw new Error('clipboard-unavailable');
         await navigator.clipboard.writeText(key.value);
-        if (active() && request === generation) feedback.textContent = 'Clave copiada. Pégala en la integración de Menú y Compra y no la compartas.';
+        if (active() && manual.open && request === generation) feedback.textContent = 'Clave copiada. Pégala en la integración de Menú y Compra y no la compartas.';
         return;
       } catch (_) { /* HTTP Ingress may not provide the Clipboard API. */ }
-      if (!active() || request !== generation || !key.value) return;
+      if (!active() || !manual.open || request !== generation || !key.value) return;
       copiedByEvent = false;
       let copied = false;
       // Browsers may suppress copy events on password fields. Select a harmless
@@ -1289,19 +1303,28 @@
     }, 'No se ha podido copiar la clave. Selecciona el campo y usa Copiar o Ctrl+C.'));
     const rotate = control('Regenerar clave…', () => run(async () => {
       clearKey();
-      if (!await confirmDialog('¿Regenerar la clave de conexión?', 'La clave anterior dejará de funcionar inmediatamente. Tendrás que actualizar la clave en la integración de Menú y Compra de Home Assistant. No se modifican el menú, la compra ni el catálogo.', 'Regenerar clave')) return;
+      const rotationNotice = connection?.automatic
+        ? 'La clave anterior dejará de funcionar inmediatamente. El enlace se actualizará automáticamente mediante Supervisor, sin copiar la clave. No se modifican el menú, la compra ni el catálogo.'
+        : 'La clave anterior dejará de funcionar inmediatamente. Tendrás que actualizar la clave en la integración de Menú y Compra de Home Assistant. No se modifican el menú, la compra ni el catálogo.';
+      if (!await confirmDialog('¿Regenerar la clave de conexión?', rotationNotice, 'Regenerar clave')) return;
       if (!active()) return;
       // Rotation is not a reveal request. Discard the returned secret.
       await api('ha/rotate', { method: 'POST', body: {} });
       if (!active()) return;
       await refresh();
-      if (active()) feedback.textContent = 'Clave regenerada. Pulsa «Mostrar clave» y «Copiar clave», y actualízala en la integración de Home Assistant. La anterior ya no funciona.';
-    }, 'No se ha podido confirmar la regeneración. No se reintentará automáticamente. Actualiza el estado y consulta la clave antes de cambiarla en la integración.'), 'btn btn-danger');
+      if (active()) feedback.textContent = connection?.automatic
+        ? 'Clave regenerada. El enlace se actualizará automáticamente mediante Supervisor; no necesitas copiar la clave. La anterior ya no funciona.'
+        : 'Clave regenerada. Pulsa «Mostrar clave» y «Copiar clave», y actualízala en la integración de Home Assistant. La anterior ya no funciona.';
+    }, 'No se ha podido confirmar la regeneración. No se reintentará automáticamente. Pulsa «Actualizar estado» antes de volver a intentarlo.'), 'btn btn-danger');
     const reload = control('Actualizar estado', () => run(async () => { clearKey(); await refresh(); }, 'No se ha podido consultar la conexión. El resto de ajustes sigue disponible. Comprueba la conexión y pulsa «Actualizar estado».'), 'btn btn-quiet');
-    section.append(status, errorBox, field('URL interna para la integración', url, 'Accesible desde Home Assistant; no es la dirección de Ingress ni una URL pública.'),
+    manual.append(h('p', { className: 'hint' }, 'Solo para una configuración manual de la integración. Usa la clave propia de esta app, no la de Home Assistant ni la de Telegram.'),
+      field('URL interna para la integración', url, 'Origen identificado por Supervisor; puede estar vacío si todavía no se conoce. No es la dirección de Ingress ni una URL pública.'),
+      h('div', { className: 'row ha-connection-actions' }, show, copy, rotate), keyField, feedback);
+    manual.addEventListener('toggle', () => { if (!manual.open) { clearKey(); draw(); } });
+    section.append(status, errorBox,
       h('div', { className: 'row ha-connection-actions' }, toggle, reload),
-      h('div', { className: 'row ha-connection-actions' }, show, copy, rotate), keyField, feedback,
-      h('p', { className: 'hint' }, 'Desactivar bloquea el acceso sin borrar tus datos. Las copias JSON no incluyen esta clave. Configura Telegram y los chats permitidos en la integración de Home Assistant.')
+      manual,
+      h('p', { className: 'hint' }, 'Desactivar bloquea el acceso sin borrar tus datos. Las copias JSON no incluyen la clave. Telegram y los chats permitidos se configuran solo en las opciones de la integración de Home Assistant Core.')
     );
     settings.dialog.addEventListener('close', clearKey, { once: true });
     settings.dialog.addEventListener('cancel', clearKey);
